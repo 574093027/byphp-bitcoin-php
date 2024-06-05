@@ -3,7 +3,7 @@
     "description": "PHP Bitcoin library with functions for transactions, signatures, serialization, Random/Deterministic ECDSA keys, blocks, RPC bindings",
     "type": "library",
     "homepage": "https://github.com/byphp/bitcoin-php",
-    "license": "Unlicense",
+    "license": "MIT",
     "version": "1.0.0",
     "authors": [
         {
