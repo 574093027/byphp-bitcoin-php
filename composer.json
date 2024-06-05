@@ -4,6 +4,7 @@
     "type": "library",
     "homepage": "https://github.com/byphp/bitcoin-php",
     "license": "Unlicense",
+    "version": "1.0.0",
     "authors": [
         {
             "name": "Thomas Kerin",
