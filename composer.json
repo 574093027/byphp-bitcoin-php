@@ -30,7 +30,7 @@
         "ext-curl": "*",
         "ext-openssl": "*",
         "ext-mcrypt": "*",
-        "mdanter/ecc": "~0.3",
+        "paragonie/ecc": "^2.0.1",
         "pleonasm/merkle-tree": "1.0.0",
         "rych/hash_pbkdf2-compat": "~1.0",
         "lastguest/murmurhash": "~1.1",
