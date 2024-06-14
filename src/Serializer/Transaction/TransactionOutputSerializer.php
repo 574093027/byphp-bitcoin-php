@@ -1,66 +1,78 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Serializer\Transaction;
 
-use BitWasp\Buffertools\BufferInterface;
-use BitWasp\Buffertools\Parser;
+use BitWasp\Bitcoin\Script\Opcodes;
 use BitWasp\Bitcoin\Script\Script;
+use BitWasp\Bitcoin\Serializer\Types;
 use BitWasp\Bitcoin\Transaction\TransactionOutput;
 use BitWasp\Bitcoin\Transaction\TransactionOutputInterface;
-use BitWasp\Buffertools\TemplateFactory;
+use BitWasp\Buffertools\Buffer;
+use BitWasp\Buffertools\BufferInterface;
+use BitWasp\Buffertools\Parser;
 
 class TransactionOutputSerializer
 {
     /**
-     * @return \BitWasp\Buffertools\Template
+     * @var \BitWasp\Buffertools\Types\Uint64
      */
-    private function getTemplate()
+    private $uint64le;
+
+    /**
+     * @var \BitWasp\Buffertools\Types\VarString
+     */
+    private $varstring;
+
+    /**
+     * @var Opcodes
+     */
+    private $opcodes;
+
+    /**
+     * TransactionOutputSerializer constructor.
+     * @param Opcodes|null $opcodes
+     */
+    public function __construct(Opcodes $opcodes = null)
     {
-        return (new TemplateFactory())
-            ->uint64le()
-            ->varstring()
-            ->getTemplate();
+        $this->uint64le = Types::uint64le();
+        $this->varstring = Types::varstring();
+        $this->opcodes = $opcodes ?: new Opcodes();
     }
 
     /**
      * @param TransactionOutputInterface $output
      * @return BufferInterface
      */
-    public function serialize(TransactionOutputInterface $output)
+    public function serialize(TransactionOutputInterface $output): BufferInterface
     {
-        return $this->getTemplate()->write([
-            $output->getValue(),
-            $output->getScript()->getBuffer()
-        ]);
-    }
-
-    /**
-     * @param Parser $parser
-     * @return TransactionOutput
-     * @throws \BitWasp\Buffertools\Exceptions\ParserOutOfRange
-     */
-    public function fromParser(Parser $parser)
-    {
-        $parse = $this->getTemplate()->parse($parser);
-        /** @var int|string $value */
-        $value = $parse[0];
-        /** @var BufferInterface $scriptBuf */
-        $scriptBuf = $parse[1];
-
-        return new TransactionOutput(
-            $value,
-            new Script($scriptBuf)
+        return new Buffer(
+            $this->uint64le->write($output->getValue()) .
+            $this->varstring->write($output->getScript()->getBuffer())
         );
     }
 
     /**
-     * @param $string
-     * @return TransactionOutput
+     * @param Parser $parser
+     * @return TransactionOutputInterface
      * @throws \BitWasp\Buffertools\Exceptions\ParserOutOfRange
      */
-    public function parse($string)
+    public function fromParser(Parser $parser): TransactionOutputInterface
     {
-        $parser = new Parser($string);
-        return $this->fromParser($parser);
+        return new TransactionOutput(
+            (int) $this->uint64le->read($parser),
+            new Script($this->varstring->read($parser), $this->opcodes)
+        );
+    }
+
+    /**
+     * @param BufferInterface $string
+     * @return TransactionOutputInterface
+     * @throws \BitWasp\Buffertools\Exceptions\ParserOutOfRange
+     */
+    public function parse(BufferInterface $string): TransactionOutputInterface
+    {
+        return $this->fromParser(new Parser($string));
     }
 }

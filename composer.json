@@ -1,46 +1,46 @@
 {
-    "name": "byphp/bitwasp-bitcoin",
-    "description": "PHP Bitcoin library with functions for transactions, signatures, serialization, Random/Deterministic ECDSA keys, blocks, RPC bindings",
-    "type": "library",
-    "homepage": "https://github.com/574093027/byphp-bitcoin-php",
-    "license": "MIT",
-    "authors": [
-        {
-            "name": "Color",
-            "email": "ijings5251@gmail.com"
-        }
-    ],
-    "autoload": {
-        "psr-4": {
-            "BitWasp\\Bitcoin\\": "src/"
-        },
-        "files": [
-            "src/Script/functions.php"
-        ]
-    },
-    "autoload-dev": {
-        "psr-4": {
-            "BitWasp\\Bitcoin\\Tests\\": "tests/"
-        }
-    },
-    "require": {
-        "php": ">=5.4.0",
-        "ext-gmp": "*",
-        "ext-json": "*",
-        "ext-curl": "*",
-        "ext-openssl": "*",
-        "ext-mcrypt": "*",
-        "paragonie/ecc": "^2.0.1",
-        "pleonasm/merkle-tree": "1.0.0",
-        "rych/hash_pbkdf2-compat": "~1.0",
-        "lastguest/murmurhash": "~1.1",
-        "byphp/protobuf-php": "^1.0.0",
-        "bitwasp/buffertools": "~0.1",
-        "bitwasp/trait": "~0.0",
-        "bitwasp/secp256k1-php": "~0.0.7"
-    },
-    "require-dev": {
-        "bitwasp/testing-php": "~0.1",
-        "symfony/yaml": "~2.6"
+  "name": "byphp/bitwasp-bitcoin",
+  "description": "PHP Bitcoin library with functions for transactions, signatures, serialization, Random/Deterministic ECDSA keys, blocks, RPC bindings",
+  "type": "library",
+  "homepage": "https://github.com/bit-wasp/bitcoin-php",
+  "license": "Unlicense",
+  "authors": [
+    {
+      "name": "Thomas Kerin",
+      "homepage": "https://thomaskerin.io",
+      "role": "Author"
     }
+  ],
+  "autoload": {
+    "psr-4": {
+      "BitWasp\\Bitcoin\\": "src/"
+    },
+    "files": ["src/Script/functions.php"]
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "BitWasp\\Bitcoin\\Tests\\": "tests/"
+    }
+  },
+  "require": {
+    "php-64bit": ">=7.0",
+    "pleonasm/merkle-tree": "1.0.0",
+    "composer/semver": "^1.4.0|^3.2.0",
+    "lastguest/murmurhash": "^2.0.0",
+    "mdanter/ecc": "^0.5.0",
+    "bitwasp/buffertools": "^0.5.0",
+    "bitwasp/bech32": "^0.0.1"
+  },
+  "suggest": {
+    "ext-secp256k1": "The secp256k1 library for fast and safe elliptic curve operations",
+    "ext-bitcoinconsensus": "The bitcoinconsensus library for safest possible script verification"
+  },
+  "require-dev": {
+    "ext-json": "*",
+    "phpunit/phpunit": "^5.4.0",
+    "squizlabs/php_codesniffer": "^2.0.0",
+    "nbobtc/bitcoind-php": "v2.0.2",
+    "bitwasp/secp256k1-php": "^v0.2.0",
+    "bitwasp/bitcoinconsensus": "v3.0.0"
+  }
 }

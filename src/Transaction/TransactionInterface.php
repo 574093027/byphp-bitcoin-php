@@ -1,141 +1,139 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Transaction;
 
-use BitWasp\Bitcoin\Collection\Transaction\TransactionInputCollection;
-use BitWasp\Bitcoin\Collection\Transaction\TransactionOutputCollection;
-use BitWasp\Bitcoin\Collection\Transaction\TransactionWitnessCollection;
 use BitWasp\Bitcoin\Script\ScriptWitnessInterface;
 use BitWasp\Bitcoin\SerializableInterface;
-use BitWasp\Bitcoin\Transaction\SignatureHash\SigHashInterface;
 use BitWasp\Bitcoin\Utxo\Utxo;
 use BitWasp\Buffertools\BufferInterface;
 
-interface TransactionInterface extends SerializableInterface, \ArrayAccess
+interface TransactionInterface extends SerializableInterface
 {
     const DEFAULT_VERSION = 1;
 
     /**
-     * The version parameter is encoded as a uint32
-     */
-
-    const MAX_VERSION = '4294967295';
-
-    /**
      * The locktime parameter is encoded as a uint32
      */
-    const MAX_LOCKTIME = '4294967295';
+    const MAX_LOCKTIME = 4294967295;
 
     /**
      * @return bool
      */
-    public function isCoinbase();
+    public function isCoinbase(): bool;
 
     /**
      * Get the transactions sha256d hash.
      *
      * @return BufferInterface
      */
-    public function getTxHash();
+    public function getTxHash(): BufferInterface;
 
     /**
      * Get the little-endian sha256d hash.
      * @return BufferInterface
      */
-    public function getTxId();
+    public function getTxId(): BufferInterface;
 
     /**
      * Get the little endian sha256d hash including witness data
      * @return BufferInterface
      */
-    public function getWitnessTxId();
+    public function getWitnessTxId(): BufferInterface;
 
     /**
      * Get the version of this transaction
      *
-     * @return int|string
+     * @return int
      */
-    public function getVersion();
+    public function getVersion(): int;
 
     /**
      * Return an array of all inputs
      *
-     * @return TransactionInputCollection
+     * @return TransactionInputInterface[]
      */
-    public function getInputs();
+    public function getInputs(): array;
 
     /**
      * @param int $index
      * @return TransactionInputInterface
      */
-    public function getInput($index);
+    public function getInput(int $index): TransactionInputInterface;
 
     /**
      * Return an array of all outputs
      *
-     * @return TransactionOutputCollection
+     * @return TransactionOutputInterface[]
      */
-    public function getOutputs();
+    public function getOutputs(): array;
 
     /**
      * @param int $vout
      * @return TransactionOutputInterface
      */
-    public function getOutput($vout);
+    public function getOutput(int $vout): TransactionOutputInterface;
 
     /**
      * @param int $index
      * @return ScriptWitnessInterface
      */
-    public function getWitness($index);
+    public function getWitness(int $index): ScriptWitnessInterface;
 
     /**
-     * @return TransactionWitnessCollection
+     * @return ScriptWitnessInterface[]
      */
-    public function getWitnesses();
+    public function getWitnesses(): array;
 
     /**
      * @param int $vout
      * @return OutPointInterface
      */
-    public function makeOutPoint($vout);
+    public function makeOutPoint(int $vout): OutPointInterface;
 
     /**
      * @param int $vout
      * @return Utxo
      */
-    public function makeUtxo($vout);
+    public function makeUtxo(int $vout): Utxo;
 
     /**
      * Return the locktime for this transaction
      *
-     * @return int|string
+     * @return int
      */
-    public function getLockTime();
+    public function getLockTime(): int;
 
     /**
-     * @return int|string
+     * @return int
      */
     public function getValueOut();
 
     /**
-     * @return SigHashInterface
+     * @return bool
      */
-    public function getSignatureHash();
+    public function hasWitness(): bool;
 
     /**
      * @param TransactionInterface $tx
      * @return bool
      */
-    public function equals(TransactionInterface $tx);
-
-    /**
-     * @return Validator
-     */
-    public function validator();
+    public function equals(TransactionInterface $tx): bool;
 
     /**
      * @return BufferInterface
      */
-    public function getWitnessBuffer();
+    public function getBaseSerialization(): BufferInterface;
+
+    /**
+     * @return BufferInterface
+     */
+    public function getWitnessSerialization(): BufferInterface;
+
+    /**
+     * @deprecated
+     * @return BufferInterface
+     */
+    public function getWitnessBuffer(): BufferInterface;
 }

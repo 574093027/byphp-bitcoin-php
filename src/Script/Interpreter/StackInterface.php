@@ -1,9 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Script\Interpreter;
 
 use BitWasp\Buffertools\BufferInterface;
 
+/**
+ * @deprecated v2.0.0 Unused in project
+ */
 interface StackInterface extends \ArrayAccess, \Iterator
 {
     /**

@@ -1,53 +1,66 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Serializer\Transaction;
 
+use BitWasp\Bitcoin\Serializer\Types;
 use BitWasp\Bitcoin\Transaction\OutPoint;
 use BitWasp\Bitcoin\Transaction\OutPointInterface;
+use BitWasp\Buffertools\Buffer;
+use BitWasp\Buffertools\BufferInterface;
 use BitWasp\Buffertools\Parser;
-use BitWasp\Buffertools\TemplateFactory;
 
 class OutPointSerializer implements OutPointSerializerInterface
 {
     /**
-     * @return \BitWasp\Buffertools\Template
+     * @var \BitWasp\Buffertools\Types\ByteString
      */
-    public function getTemplate()
+    private $txid;
+
+    /**
+     * @var \BitWasp\Buffertools\Types\Uint32
+     */
+    private $vout;
+
+    public function __construct()
     {
-        return (new TemplateFactory())
-            ->bytestringle(32)
-            ->uint32le()
-            ->getTemplate();
+        $this->txid = Types::bytestringle(32);
+        $this->vout = Types::uint32le();
     }
 
     /**
      * @param OutPointInterface $outpoint
-     * @return \BitWasp\Buffertools\BufferInterface
+     * @return BufferInterface
+     * @throws \Exception
      */
-    public function serialize(OutPointInterface $outpoint)
+    public function serialize(OutPointInterface $outpoint): BufferInterface
     {
-        return $this->getTemplate()->write([
-            $outpoint->getTxId(),
-            $outpoint->getVout()
-        ]);
+        return new Buffer(
+            $this->txid->write($outpoint->getTxId()) .
+            $this->vout->write($outpoint->getVout())
+        );
     }
 
     /**
      * @param Parser $parser
      * @return OutPointInterface
+     * @throws \BitWasp\Buffertools\Exceptions\ParserOutOfRange
      */
-    public function fromParser(Parser $parser)
+    public function fromParser(Parser $parser): OutPointInterface
     {
-        list ($txid, $vout) = $this->getTemplate()->parse($parser);
-
-        return new OutPoint($txid, $vout);
+        return new OutPoint(
+            new Buffer(strrev($parser->readBytes(32)->getBinary()), 32),
+            unpack("V", $parser->readBytes(4)->getBinary())[1]
+        );
     }
 
     /**
-     * @param string|\BitWasp\Buffertools\BufferInterface $data
+     * @param BufferInterface $data
      * @return OutPointInterface
+     * @throws \BitWasp\Buffertools\Exceptions\ParserOutOfRange
      */
-    public function parse($data)
+    public function parse(BufferInterface $data): OutPointInterface
     {
         return $this->fromParser(new Parser($data));
     }

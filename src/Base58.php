@@ -1,9 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin;
 
 use BitWasp\Bitcoin\Crypto\Hash;
 use BitWasp\Bitcoin\Exceptions\Base58ChecksumFailure;
+use BitWasp\Bitcoin\Exceptions\Base58InvalidCharacter;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\BufferInterface;
 use BitWasp\Buffertools\Buffertools;
@@ -18,30 +21,31 @@ class Base58
     /**
      * Encode a given hex string in base58
      *
-     * @param BufferInterface $binary
+     * @param BufferInterface $buffer
      * @return string
-     * @throws \Exception
      */
-    public static function encode(BufferInterface $binary)
+    public static function encode(BufferInterface $buffer): string
     {
-        $size = $binary->getSize();
-        if ($binary->getBinary() === '') {
+        $size = $buffer->getSize();
+        if ($size === 0) {
             return '';
         }
 
-        $math = Bitcoin::getMath();
-
-        $orig = $binary->getBinary();
-        $decimal = $binary->getInt();
+        $orig = $buffer->getBinary();
+        $decimal = $buffer->getGmp();
 
         $return = '';
-        while ($math->cmp($decimal, 0) > 0) {
-            list($decimal, $rem) = $math->divQr($decimal, 58);
-            $return .= self::$base58chars[$rem];
+        $zero = gmp_init(0);
+        $_58 = gmp_init(58);
+        while (gmp_cmp($decimal, $zero) > 0) {
+            $div = gmp_div($decimal, $_58);
+            $rem = gmp_sub($decimal, gmp_mul($div, $_58));
+            $return .= self::$base58chars[(int) gmp_strval($rem, 10)];
+            $decimal = $div;
         }
         $return = strrev($return);
 
-        //leading zeros
+        // Leading zeros
         for ($i = 0; $i < $size && $orig[$i] === "\x00"; $i++) {
             $return = '1' . $return;
         }
@@ -51,25 +55,29 @@ class Base58
 
     /**
      * Decode a base58 string
-     *
      * @param string $base58
      * @return BufferInterface
+     * @throws Base58InvalidCharacter
      */
-    public static function decode($base58)
+    public static function decode(string $base58): BufferInterface
     {
-        $math = Bitcoin::getMath();
         if ($base58 === '') {
-            return new Buffer('', 0, $math);
+            return new Buffer('', 0);
         }
 
         $original = $base58;
         $length = strlen($base58);
-        $return = '0';
+        $return = gmp_init(0);
+        $_58 = gmp_init(58);
         for ($i = 0; $i < $length; $i++) {
-            $return = $math->add($math->mul($return, 58), strpos(self::$base58chars, $base58[$i]));
+            $loc = strpos(self::$base58chars, $base58[$i]);
+            if ($loc === false) {
+                throw new Base58InvalidCharacter('Found character that is not allowed in base58: ' . $base58[$i]);
+            }
+            $return = gmp_add(gmp_mul($return, $_58), gmp_init($loc, 10));
         }
 
-        $binary = $math->cmp($return, '0') === 0 ? '' : hex2bin($math->decHex($return));
+        $binary = gmp_cmp($return, gmp_init(0)) === 0 ? '' : Buffer::int(gmp_strval($return, 10))->getBinary();
         for ($i = 0; $i < $length && $original[$i] === '1'; $i++) {
             $binary = "\x00" . $binary;
         }
@@ -78,30 +86,34 @@ class Base58
     }
 
     /**
-     * Calculate a checksum for the given data
-     *
      * @param BufferInterface $data
      * @return BufferInterface
      */
-    public static function checksum(BufferInterface $data)
+    public static function checksum(BufferInterface $data): BufferInterface
     {
         return Hash::sha256d($data)->slice(0, 4);
     }
 
     /**
      * Decode a base58 checksum string and validate checksum
-     *
      * @param string $base58
      * @return BufferInterface
      * @throws Base58ChecksumFailure
+     * @throws Base58InvalidCharacter
+     * @throws \Exception
      */
-    public static function decodeCheck($base58)
+    public static function decodeCheck(string $base58): BufferInterface
     {
-        $hex = self::decode($base58);
-        $data = $hex->slice(0, -4);
-        $csVerify = $hex->slice(-4);
+        $decoded = self::decode($base58);
+        $checksumLength = 4;
+        if ($decoded->getSize() < $checksumLength) {
+            throw new Base58ChecksumFailure("Missing base58 checksum");
+        }
 
-        if (self::checksum($data)->getBinary() !== $csVerify->getBinary()) {
+        $data = $decoded->slice(0, -$checksumLength);
+        $csVerify = $decoded->slice(-$checksumLength);
+
+        if (!hash_equals(self::checksum($data)->getBinary(), $csVerify->getBinary())) {
             throw new Base58ChecksumFailure('Failed to verify checksum');
         }
 
@@ -113,9 +125,8 @@ class Base58
      *
      * @param BufferInterface $data
      * @return string
-     * @throws \Exception
      */
-    public static function encodeCheck(BufferInterface $data)
+    public static function encodeCheck(BufferInterface $data): string
     {
         return self::encode(Buffertools::concat($data, self::checksum($data)));
     }

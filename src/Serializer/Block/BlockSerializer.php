@@ -1,16 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Serializer\Block;
 
 use BitWasp\Bitcoin\Block\Block;
-use BitWasp\Bitcoin\Collection\Transaction\TransactionCollection;
-use BitWasp\Bitcoin\Serializer\Transaction\TransactionSerializerInterface;
-use BitWasp\Buffertools\Buffertools;
-use BitWasp\Buffertools\Exceptions\ParserOutOfRange;
-use BitWasp\Bitcoin\Math\Math;
-use BitWasp\Buffertools\Parser;
 use BitWasp\Bitcoin\Block\BlockInterface;
-use BitWasp\Buffertools\TemplateFactory;
+use BitWasp\Bitcoin\Math\Math;
+use BitWasp\Bitcoin\Serializer\Transaction\TransactionSerializerInterface;
+use BitWasp\Bitcoin\Serializer\Types;
+use BitWasp\Buffertools\BufferInterface;
+use BitWasp\Buffertools\Exceptions\ParserOutOfRange;
+use BitWasp\Buffertools\Parser;
 
 class BlockSerializer implements BlockSerializerInterface
 {
@@ -23,6 +24,11 @@ class BlockSerializer implements BlockSerializerInterface
      * @var BlockHeaderSerializer
      */
     private $headerSerializer;
+
+    /**
+     * @var \BitWasp\Buffertools\Types\VarInt
+     */
+    private $varint;
 
     /**
      * @var TransactionSerializerInterface
@@ -38,19 +44,8 @@ class BlockSerializer implements BlockSerializerInterface
     {
         $this->math = $math;
         $this->headerSerializer = $headerSerializer;
+        $this->varint = Types::varint();
         $this->txSerializer = $txSerializer;
-    }
-
-    /**
-     * @return \BitWasp\Buffertools\Template
-     */
-    private function getTxsTemplate()
-    {
-        return (new TemplateFactory())
-            ->vector(function (Parser $parser) {
-                return $this->txSerializer->fromParser($parser);
-            })
-            ->getTemplate();
     }
 
     /**
@@ -58,38 +53,43 @@ class BlockSerializer implements BlockSerializerInterface
      * @return BlockInterface
      * @throws ParserOutOfRange
      */
-    public function fromParser(Parser $parser)
+    public function fromParser(Parser $parser): BlockInterface
     {
         try {
-            return new Block(
-                $this->math,
-                $this->headerSerializer->fromParser($parser),
-                new TransactionCollection($this->getTxsTemplate()->parse($parser)[0])
-            );
+            $header = $this->headerSerializer->fromParser($parser);
+            $nTx = $this->varint->read($parser);
+            $vTx = [];
+            for ($i = 0; $i < $nTx; $i++) {
+                $vTx[] = $this->txSerializer->fromParser($parser);
+            }
+            return new Block($this->math, $header, ...$vTx);
         } catch (ParserOutOfRange $e) {
             throw new ParserOutOfRange('Failed to extract full block header from parser');
         }
     }
 
     /**
-     * @param \BitWasp\Buffertools\BufferInterface|string $string
+     * @param BufferInterface $buffer
      * @return BlockInterface
      * @throws ParserOutOfRange
      */
-    public function parse($string)
+    public function parse(BufferInterface $buffer): BlockInterface
     {
-        return $this->fromParser(new Parser($string));
+        return $this->fromParser(new Parser($buffer));
     }
 
     /**
      * @param BlockInterface $block
-     * @return \BitWasp\Buffertools\BufferInterface
+     * @return BufferInterface
      */
-    public function serialize(BlockInterface $block)
+    public function serialize(BlockInterface $block): BufferInterface
     {
-        return Buffertools::concat(
-            $this->headerSerializer->serialize($block->getHeader()),
-            $this->getTxsTemplate()->write([$block->getTransactions()->all()])
-        );
+        $parser = new Parser($this->headerSerializer->serialize($block->getHeader()));
+        $parser->appendBinary($this->varint->write(count($block->getTransactions())));
+        foreach ($block->getTransactions() as $tx) {
+            $parser->appendBuffer($this->txSerializer->serialize($tx));
+        }
+
+        return $parser->getBuffer();
     }
 }

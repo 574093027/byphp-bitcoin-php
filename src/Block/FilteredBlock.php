@@ -1,12 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Block;
 
 use BitWasp\Bitcoin\Serializable;
 use BitWasp\Bitcoin\Serializer\Block\BlockHeaderSerializer;
 use BitWasp\Bitcoin\Serializer\Block\FilteredBlockSerializer;
 use BitWasp\Bitcoin\Serializer\Block\PartialMerkleTreeSerializer;
-use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\BufferInterface;
 
 class FilteredBlock extends Serializable
@@ -34,7 +35,7 @@ class FilteredBlock extends Serializable
     /**
      * @return BlockHeaderInterface
      */
-    public function getHeader()
+    public function getHeader(): BlockHeaderInterface
     {
         return $this->header;
     }
@@ -42,7 +43,7 @@ class FilteredBlock extends Serializable
     /**
      * @return PartialMerkleTree
      */
-    public function getPartialTree()
+    public function getPartialTree(): PartialMerkleTree
     {
         return $this->partialTree;
     }
@@ -50,7 +51,7 @@ class FilteredBlock extends Serializable
     /**
      * @return BufferInterface
      */
-    public function getBuffer()
+    public function getBuffer(): BufferInterface
     {
         return (new FilteredBlockSerializer(new BlockHeaderSerializer(), new PartialMerkleTreeSerializer()))->serialize($this);
     }

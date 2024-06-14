@@ -1,12 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Transaction\Mutator;
 
-use BitWasp\Bitcoin\Collection\MutableCollection;
-use BitWasp\Bitcoin\Collection\Transaction\TransactionInputCollection;
 use BitWasp\Bitcoin\Transaction\TransactionInputInterface;
 
-class InputCollectionMutator extends MutableCollection
+class InputCollectionMutator extends AbstractCollectionMutator
 {
 
     /**
@@ -26,7 +26,7 @@ class InputCollectionMutator extends MutableCollection
     /**
      * @return InputMutator
      */
-    public function current()
+    public function current(): InputMutator
     {
         return $this->set->current();
     }
@@ -35,7 +35,7 @@ class InputCollectionMutator extends MutableCollection
      * @param int $offset
      * @return InputMutator
      */
-    public function offsetGet($offset)
+    public function offsetGet($offset): InputMutator
     {
         if (!$this->set->offsetExists($offset)) {
             throw new \OutOfRangeException('Input does not exist');
@@ -45,24 +45,24 @@ class InputCollectionMutator extends MutableCollection
     }
 
     /**
-     * @return TransactionInputCollection
+     * @return TransactionInputInterface[]
      */
-    public function done()
+    public function done(): array
     {
         $set = [];
         foreach ($this->set as $mutator) {
             $set[] = $mutator->done();
         }
 
-        return new TransactionInputCollection($set);
+        return $set;
     }
 
     /**
-     * @param int|string $start
-     * @param int|string $length
+     * @param int $start
+     * @param int $length
      * @return $this
      */
-    public function slice($start, $length)
+    public function slice(int $start, int $length)
     {
         $end = $this->set->getSize();
         if ($start > $end || $length > $end) {
@@ -100,7 +100,7 @@ class InputCollectionMutator extends MutableCollection
      * @param TransactionInputInterface $input
      * @return $this
      */
-    public function set($i, TransactionInputInterface $input)
+    public function set(int $i, TransactionInputInterface $input)
     {
         $this->set[$i] = new InputMutator($input);
         return $this;

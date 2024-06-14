@@ -1,87 +1,89 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Serializer\Transaction;
 
-use BitWasp\Buffertools\BufferInterface;
-use BitWasp\Buffertools\Buffertools;
-use BitWasp\Buffertools\Parser;
+use BitWasp\Bitcoin\Script\Opcodes;
 use BitWasp\Bitcoin\Script\Script;
+use BitWasp\Bitcoin\Serializer\Types;
 use BitWasp\Bitcoin\Transaction\TransactionInput;
 use BitWasp\Bitcoin\Transaction\TransactionInputInterface;
-use BitWasp\Buffertools\TemplateFactory;
+use BitWasp\Buffertools\Buffer;
+use BitWasp\Buffertools\BufferInterface;
+use BitWasp\Buffertools\Parser;
 
 class TransactionInputSerializer
 {
     /**
-     * @var OutPointSerializer
+     * @var OutPointSerializerInterface
      */
     private $outpointSerializer;
 
     /**
-     * TransactionInputSerializer constructor.
-     * @param OutPointSerializer $outPointSerializer
+     * @var \BitWasp\Buffertools\Types\VarString
      */
-    public function __construct(OutPointSerializer $outPointSerializer)
-    {
-        $this->outpointSerializer = $outPointSerializer;
-    }
+    private $varstring;
 
     /**
-     * @return \BitWasp\Buffertools\Template
+     * @var \BitWasp\Buffertools\Types\Uint32
      */
-    private function getInputTemplate()
+    private $uint32le;
+
+    /**
+     * @var Opcodes
+     */
+    private $opcodes;
+
+    /**
+     * TransactionInputSerializer constructor.
+     * @param OutPointSerializerInterface $outPointSerializer
+     * @param Opcodes|null $opcodes
+     */
+    public function __construct(OutPointSerializerInterface $outPointSerializer, Opcodes $opcodes = null)
     {
-        return (new TemplateFactory())
-            ->varstring()
-            ->uint32le()
-            ->getTemplate();
+        $this->outpointSerializer = $outPointSerializer;
+        $this->varstring = Types::varstring();
+        $this->uint32le = Types::uint32le();
+        $this->opcodes = $opcodes ?: new Opcodes();
     }
 
     /**
      * @param TransactionInputInterface $input
      * @return BufferInterface
      */
-    public function serialize(TransactionInputInterface $input)
+    public function serialize(TransactionInputInterface $input): BufferInterface
     {
-        return Buffertools::concat(
-            $this->outpointSerializer->serialize($input->getOutPoint()),
-            $this->getInputTemplate()->write([
-                $input->getScript()->getBuffer(),
-                $input->getSequence()
-            ])
+        return new Buffer(
+            $this->outpointSerializer->serialize($input->getOutPoint())->getBinary() .
+            $this->varstring->write($input->getScript()->getBuffer()) .
+            $this->uint32le->write($input->getSequence())
         );
     }
 
     /**
      * @param Parser $parser
-     * @return TransactionInput
+     * @return TransactionInputInterface
      * @throws \BitWasp\Buffertools\Exceptions\ParserOutOfRange
+     * @throws \Exception
      */
-    public function fromParser(Parser $parser)
+    public function fromParser(Parser $parser): TransactionInputInterface
     {
-        $outpoint = $this->outpointSerializer->fromParser($parser);
-
-        /**
-         * @var BufferInterface $scriptBuf
-         * @var int|string $sequence
-         */
-        list ($scriptBuf, $sequence) = $this->getInputTemplate()->parse($parser);
-
         return new TransactionInput(
-            $outpoint,
-            new Script($scriptBuf),
-            $sequence
+            $this->outpointSerializer->fromParser($parser),
+            new Script($this->varstring->read($parser), $this->opcodes),
+            (int) $this->uint32le->read($parser)
         );
     }
 
     /**
-     * @param BufferInterface|string $string
-     * @return TransactionInput
+     * @param BufferInterface $string
+     * @return TransactionInputInterface
      * @throws \BitWasp\Buffertools\Exceptions\ParserOutOfRange
+     * @throws \Exception
      */
-    public function parse($string)
+    public function parse(BufferInterface $string): TransactionInputInterface
     {
-        $parser = new Parser($string);
-        return $this->fromParser($parser);
+        return $this->fromParser(new Parser($string));
     }
 }

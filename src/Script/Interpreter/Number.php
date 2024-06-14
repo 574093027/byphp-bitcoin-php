@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Script\Interpreter;
 
 use BitWasp\Bitcoin\Bitcoin;
@@ -11,8 +13,8 @@ use BitWasp\Buffertools\BufferInterface;
 class Number extends Serializable
 {
     const MAX_NUM_SIZE = 4;
-    const MAX = 2147483647; // 2^31-1
-    const MIN = -2147483647; // -2^31+1
+    const MAX = 2**31-1;
+    const MIN = -2**31+1;
 
     /**
      * @var Math
@@ -20,13 +22,13 @@ class Number extends Serializable
     private $math;
 
     /**
-     * @var int
+     * @var int|string
      */
     private $number;
 
     /**
      * Number constructor.
-     * @param int $number
+     * @param int|string $number
      * @param Math $math
      */
     public function __construct($number, Math $math)
@@ -36,7 +38,7 @@ class Number extends Serializable
     }
 
     /**
-     * @param int $number
+     * @param int|string $number
      * @param Math|null $math
      * @return self
      */
@@ -44,6 +46,19 @@ class Number extends Serializable
     {
         return new self(
             $number,
+            $math ?: Bitcoin::getMath()
+        );
+    }
+
+    /**
+     * @param \GMP $number
+     * @param Math|null $math
+     * @return self
+     */
+    public static function gmp(\GMP $number, Math $math = null)
+    {
+        return new self(
+            gmp_strval($number, 10),
             $math ?: Bitcoin::getMath()
         );
     }
@@ -64,8 +79,8 @@ class Number extends Serializable
 
         if ($fRequireMinimal && $size > 0) {
             $binary = $vch->getBinary();
-            if (ord($binary[$size - 1]) & 0x7f === 0) {
-                if ($size <= 1 || ord($binary[$size - 2]) & 0x80 === 0) {
+            if ((ord($binary[$size - 1]) & 0x7f) === 0) {
+                if ($size <= 1 || (ord($binary[$size - 2]) & 0x80) === 0) {
                     throw new \RuntimeException('Non-minimally encoded script number');
                 }
             }
@@ -79,51 +94,49 @@ class Number extends Serializable
 
     /**
      * @param BufferInterface $buffer
-     * @return int
+     * @return string
      */
-    private function parseBuffer(BufferInterface $buffer)
+    private function parseBuffer(BufferInterface $buffer): string
     {
         $size = $buffer->getSize();
         if ($size === 0) {
             return '0';
         }
 
-        $chars = array_map(function ($binary) {
-            return ord($binary);
+        $chars = array_values(unpack("C*", $buffer->getBinary()));
 
-        }, str_split($buffer->getBinary(), 1));
-
-        $result = 0;
+        $result = gmp_init(0);
         for ($i = 0; $i < $size; $i++) {
-            $mul = $this->math->mul($i, 8);
-            $byte = $this->math->leftShift($chars[$i], $mul);
+            $mul = $i * 8;
+            $byte = $this->math->leftShift(gmp_init($chars[$i], 10), $mul);
             $result = $this->math->bitwiseOr($result, $byte);
         }
 
         if ($chars[count($chars)-1] & 0x80) {
-            $mask = gmp_strval(gmp_com($this->math->leftShift(0x80, (8 * ($size - 1)))), 10);
-            return $this->math->sub(0, $this->math->bitwiseAnd($result, $mask));
+            $mask = gmp_com($this->math->leftShift(gmp_init(0x80), (8 * ($size - 1))));
+            $result = $this->math->sub(gmp_init(0), $this->math->bitwiseAnd($result, $mask));
         }
 
-        return $result;
+        return gmp_strval($result, 10);
     }
 
     /**
      * @return BufferInterface
      */
-    private function serialize()
+    private function serialize(): BufferInterface
     {
-        if ($this->math->cmp($this->number, '0') === 0) {
+        if ((int) $this->number === 0) {
             return new Buffer('', 0);
         }
 
+        $zero = gmp_init(0);
         // Using array of integers instead of bytes
         $result = [];
-        $negative = $this->math->cmp($this->number, 0) < 0;
-        $abs = $negative ? $this->math->sub(0, $this->number) : $this->number;
-
-        while ($this->math->cmp($abs, 0) > 0) {
-            $result[] = (int)$this->math->bitwiseAnd($abs, 0xff);
+        $negative = $this->math->cmp(gmp_init($this->number), $zero) < 0;
+        $abs = $negative ? $this->math->sub($zero, gmp_init($this->number, 10)) : gmp_init($this->number, 10);
+        $mask = gmp_init(0xff);
+        while ($this->math->cmp($abs, $zero) > 0) {
+            $result[] = (int) gmp_strval($this->math->bitwiseAnd($abs, $mask), 10);
             $abs = $this->math->rightShift($abs, 8);
         }
 
@@ -133,19 +146,13 @@ class Number extends Serializable
             $result[count($result) - 1] |= 0x80;
         }
 
-        $s = '';
-        foreach ($result as $i) {
-            $s .= chr($i);
-        }
-
-        return new Buffer($s, null, $this->math);
-
+        return new Buffer(pack("C*", ...$result));
     }
 
     /**
      * @return BufferInterface
      */
-    public function getBuffer()
+    public function getBuffer(): BufferInterface
     {
         return $this->serialize();
     }
@@ -153,14 +160,22 @@ class Number extends Serializable
     /**
      * @return int
      */
-    public function getInt()
+    public function getInt(): int
     {
-        if ($this->math->cmp($this->number, self::MAX) > 0) {
+        if ($this->math->cmp(gmp_init($this->number, 10), gmp_init(self::MAX)) > 0) {
             return self::MAX;
-        } else if ($this->math->cmp($this->number, self::MIN) < 0) {
+        } else if ($this->math->cmp(gmp_init($this->number, 10), gmp_init(self::MIN)) < 0) {
             return self::MIN;
         }
 
-        return $this->number;
+        return (int) $this->number;
+    }
+
+    /**
+     * @return \GMP
+     */
+    public function getGmp()
+    {
+        return gmp_init($this->number, 10);
     }
 }

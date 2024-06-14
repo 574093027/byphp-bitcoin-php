@@ -1,16 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Transaction;
 
+use BitWasp\Bitcoin\Exceptions\InvalidHashLengthException;
 use BitWasp\Bitcoin\Serializable;
 use BitWasp\Bitcoin\Serializer\Transaction\OutPointSerializer;
+use BitWasp\Bitcoin\Util\IntRange;
+use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\BufferInterface;
-use BitWasp\CommonTrait\FunctionAliasArrayAccess;
 
 class OutPoint extends Serializable implements OutPointInterface
 {
-    use FunctionAliasArrayAccess;
-
     /**
      * @var BufferInterface
      */
@@ -25,25 +27,34 @@ class OutPoint extends Serializable implements OutPointInterface
      * OutPoint constructor.
      * @param BufferInterface $hashPrevOutput
      * @param int $nPrevOutput
+     * @throws InvalidHashLengthException
      */
-    public function __construct(BufferInterface $hashPrevOutput, $nPrevOutput)
+    public function __construct(BufferInterface $hashPrevOutput, int $nPrevOutput)
     {
         if ($hashPrevOutput->getSize() !== 32) {
-            throw new \InvalidArgumentException('OutPoint: hashPrevOut must be a 32-byte Buffer');
+            throw new InvalidHashLengthException('OutPoint: hashPrevOut must be a 32-byte Buffer');
         }
-        
+
+        if ($nPrevOutput < 0 || $nPrevOutput > IntRange::U32_MAX) {
+            throw new \InvalidArgumentException('nPrevOut must be between 0 and 0xffffffff');
+        }
+
         $this->hashPrevOutput = $hashPrevOutput;
         $this->nPrevOutput = $nPrevOutput;
+    }
 
-        $this
-            ->initFunctionAlias('txid', 'getTxId')
-            ->initFunctionAlias('vout', 'getVout');
+    /**
+     * @return OutPointInterface
+     */
+    public static function makeCoinbase(): OutPointInterface
+    {
+        return new OutPoint(new Buffer("", 32), 0xffffffff);
     }
 
     /**
      * @return BufferInterface
      */
-    public function getTxId()
+    public function getTxId(): BufferInterface
     {
         return $this->hashPrevOutput;
     }
@@ -51,16 +62,16 @@ class OutPoint extends Serializable implements OutPointInterface
     /**
      * @return int
      */
-    public function getVout()
+    public function getVout(): int
     {
         return $this->nPrevOutput;
     }
 
     /**
      * @param OutPointInterface $outPoint
-     * @return int
+     * @return bool
      */
-    public function equals(OutPointInterface $outPoint)
+    public function equals(OutPointInterface $outPoint): bool
     {
         $txid = strcmp($this->getTxId()->getBinary(), $outPoint->getTxId()->getBinary());
         if ($txid !== 0) {
@@ -73,7 +84,7 @@ class OutPoint extends Serializable implements OutPointInterface
     /**
      * @return BufferInterface
      */
-    public function getBuffer()
+    public function getBuffer(): BufferInterface
     {
         return (new OutPointSerializer())->serialize($this);
     }

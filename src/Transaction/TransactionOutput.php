@@ -1,18 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Transaction;
 
 use BitWasp\Bitcoin\Script\ScriptInterface;
 use BitWasp\Bitcoin\Serializable;
 use BitWasp\Bitcoin\Serializer\Transaction\TransactionOutputSerializer;
-use BitWasp\CommonTrait\FunctionAliasArrayAccess;
+use BitWasp\Buffertools\BufferInterface;
 
 class TransactionOutput extends Serializable implements TransactionOutputInterface
 {
-    use FunctionAliasArrayAccess;
 
     /**
-     * @var string|int
+     * @var int
      */
     private $value;
 
@@ -27,45 +28,38 @@ class TransactionOutput extends Serializable implements TransactionOutputInterfa
      * @param int $value
      * @param ScriptInterface $script
      */
-    public function __construct($value, ScriptInterface $script)
+    public function __construct(int $value, ScriptInterface $script)
     {
-
+        if ($value < 0) {
+            throw new \RuntimeException('Transaction output value cannot be negative');
+        }
         $this->value = $value;
         $this->script = $script;
-        $this
-            ->initFunctionAlias('value', 'getValue')
-            ->initFunctionAlias('script', 'getScript');
     }
 
     /**
-     * @return void
-     */
-    public function __clone()
-    {
-        $this->script = clone $this->script;
-    }
-
-    /**
+     * {@inheritdoc}
      * @see TransactionOutputInterface::getValue()
      */
-    public function getValue()
+    public function getValue(): int
     {
         return $this->value;
     }
 
     /**
+     * {@inheritdoc}
      * @see TransactionOutputInterface::getScript()
      */
-    public function getScript()
+    public function getScript(): ScriptInterface
     {
         return $this->script;
     }
 
     /**
-     * @param TransactionOutputInterface $output
-     * @return bool
+     * {@inheritdoc}
+     * @see TransactionOutputInterface::equals()
      */
-    public function equals(TransactionOutputInterface $output)
+    public function equals(TransactionOutputInterface $output): bool
     {
         $script = $this->script->equals($output->getScript());
         if (!$script) {
@@ -76,9 +70,10 @@ class TransactionOutput extends Serializable implements TransactionOutputInterfa
     }
 
     /**
+     * {@inheritdoc}
      * @see \BitWasp\Bitcoin\SerializableInterface::getBuffer()
      */
-    public function getBuffer()
+    public function getBuffer(): BufferInterface
     {
         return (new TransactionOutputSerializer())->serialize($this);
     }

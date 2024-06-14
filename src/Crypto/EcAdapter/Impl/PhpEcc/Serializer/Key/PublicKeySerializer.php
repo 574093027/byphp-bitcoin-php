@@ -1,15 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Serializer\Key;
 
+use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Adapter\EcAdapter;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Key\PublicKey;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PublicKeyInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Key\PublicKeySerializerInterface;
 use BitWasp\Buffertools\Buffer;
-use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Adapter\EcAdapter;
-use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Key\PublicKey;
 use BitWasp\Buffertools\BufferInterface;
-use BitWasp\Buffertools\Parser;
-use Mdanter\Ecc\Primitives\PointInterface;
 
 class PublicKeySerializer implements PublicKeySerializerInterface
 {
@@ -27,64 +27,63 @@ class PublicKeySerializer implements PublicKeySerializerInterface
     }
 
     /**
-     * @param bool $compressed
-     * @param PointInterface $point
+     * @param PublicKey $publicKey
      * @return string
      */
-    public function getPrefix($compressed, PointInterface $point)
+    public function getPrefix(PublicKey $publicKey): string
     {
-        return $compressed
-            ? $this->ecAdapter->getMath()->isEven($point->getY())
-                ? PublicKey::KEY_COMPRESSED_EVEN
-                : PublicKey::KEY_COMPRESSED_ODD
-            : PublicKey::KEY_UNCOMPRESSED;
+        if (null === $publicKey->getPrefix()) {
+            return $publicKey->isCompressed()
+                ? $this->ecAdapter->getMath()->isEven($publicKey->getPoint()->getY())
+                    ? PublicKey::KEY_COMPRESSED_EVEN
+                    : PublicKey::KEY_COMPRESSED_ODD
+                : PublicKey::KEY_UNCOMPRESSED;
+        } else {
+            return $publicKey->getPrefix();
+        }
     }
 
     /**
      * @param PublicKey $publicKey
      * @return BufferInterface
      */
-    private function doSerialize(PublicKey $publicKey)
+    private function doSerialize(PublicKey $publicKey): BufferInterface
     {
-        $math = $this->ecAdapter->getMath();
         $point = $publicKey->getPoint();
-        $compressed = $publicKey->isCompressed();
 
-        $parser = new Parser('', $math);
-        $parser->writeBytes(1, $this->getPrefix($compressed, $point));
+        $length = 33;
+        $data = $this->getPrefix($publicKey) . Buffer::int(gmp_strval($point->getX(), 10), 32)->getBinary();
+        if (!$publicKey->isCompressed()) {
+            $length = 65;
+            $data .= Buffer::int(gmp_strval($point->getY(), 10), 32)->getBinary();
+        }
 
-        $compressed
-            ? $parser
-            ->writeBytes(32, Buffer::int($point->getX(), null, $math))
-            : $parser
-            ->writeBytes(32, Buffer::int($point->getX(), null, $math))
-            ->writeBytes(32, Buffer::int($point->getY(), null, $math));
-
-        return $parser->getBuffer();
+        return new Buffer($data, $length);
     }
 
     /**
      * @param PublicKeyInterface $publicKey
      * @return BufferInterface
      */
-    public function serialize(PublicKeyInterface $publicKey)
+    public function serialize(PublicKeyInterface $publicKey): BufferInterface
     {
         /** @var PublicKey $publicKey */
         return $this->doSerialize($publicKey);
     }
 
     /**
-     * @param BufferInterface|string $data
-     * @return PublicKey
+     * @param BufferInterface $buffer
+     * @return PublicKeyInterface
      * @throws \Exception
      */
-    public function parse($data)
+    public function parse(BufferInterface $buffer): PublicKeyInterface
     {
-        $buffer = (new Parser($data))->getBuffer();
         if (!in_array($buffer->getSize(), [PublicKey::LENGTH_COMPRESSED, PublicKey::LENGTH_UNCOMPRESSED], true)) {
             throw new \Exception('Invalid hex string, must match size of compressed or uncompressed public key');
         }
 
-        return $this->ecAdapter->publicKeyFromBuffer($buffer);
+        /** @var PublicKey $key */
+        $key = $this->ecAdapter->publicKeyFromBuffer($buffer);
+        return $key;
     }
 }

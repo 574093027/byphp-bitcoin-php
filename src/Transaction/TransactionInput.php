@@ -1,20 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Transaction;
 
 use BitWasp\Bitcoin\Bitcoin;
-use BitWasp\Bitcoin\Serializer\Transaction\OutPointSerializer;
-use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Script\ScriptInterface;
 use BitWasp\Bitcoin\Serializable;
+use BitWasp\Bitcoin\Serializer\Transaction\OutPointSerializer;
 use BitWasp\Bitcoin\Serializer\Transaction\TransactionInputSerializer;
 use BitWasp\Buffertools\BufferInterface;
-use BitWasp\CommonTrait\FunctionAliasArrayAccess;
 
 class TransactionInput extends Serializable implements TransactionInputInterface
 {
-    use FunctionAliasArrayAccess;
-
     /**
      * @var OutPointInterface
      */
@@ -26,7 +24,7 @@ class TransactionInput extends Serializable implements TransactionInputInterface
     private $script;
 
     /**
-     * @var string|int
+     * @var int
      */
     private $sequence;
 
@@ -35,39 +33,25 @@ class TransactionInput extends Serializable implements TransactionInputInterface
      * @param ScriptInterface $script
      * @param int $sequence
      */
-    public function __construct(OutPointInterface $outPoint, ScriptInterface $script, $sequence = self::SEQUENCE_FINAL)
+    public function __construct(OutPointInterface $outPoint, ScriptInterface $script, int $sequence = self::SEQUENCE_FINAL)
     {
         $this->outPoint = $outPoint;
         $this->script = $script;
         $this->sequence = $sequence;
-
-        $this
-            ->initFunctionAlias('outpoint', 'getOutPoint')
-            ->initFunctionAlias('script', 'getScript')
-            ->initFunctionAlias('sequence', 'getSequence');
-
-    }
-
-    /**
-     * @return TransactionInput
-     */
-    public function __clone()
-    {
-        $this->script = clone $this->script;
     }
 
     /**
      * @return OutPointInterface
      */
-    public function getOutPoint()
+    public function getOutPoint(): OutPointInterface
     {
         return $this->outPoint;
     }
 
     /**
-     * @return Script
+     * @return ScriptInterface
      */
-    public function getScript()
+    public function getScript(): ScriptInterface
     {
         return $this->script;
     }
@@ -75,56 +59,106 @@ class TransactionInput extends Serializable implements TransactionInputInterface
     /**
      * @return int
      */
-    public function getSequence()
+    public function getSequence(): int
     {
         return $this->sequence;
     }
 
     /**
-     * @param TransactionInputInterface $input
+     * @param TransactionInputInterface $other
      * @return bool
      */
-    public function equals(TransactionInputInterface $input)
+    public function equals(TransactionInputInterface $other): bool
     {
-        $outPoint = $this->outPoint->equals($input->getOutPoint());
-        if (!$outPoint) {
+        if (!$this->outPoint->equals($other->getOutPoint())) {
             return false;
         }
 
-        $script = $this->script->equals($input->getScript());
-        if (!$script) {
+        if (!$this->script->equals($other->getScript())) {
             return false;
         }
 
-        return gmp_cmp($this->sequence, $input->getSequence()) === 0;
+        return gmp_cmp(gmp_init($this->sequence), gmp_init($other->getSequence())) === 0;
     }
 
     /**
      * Check whether this transaction is a Coinbase transaction
      *
-     * @return boolean
+     * @return bool
      */
-    public function isCoinbase()
+    public function isCoinbase(): bool
     {
-        $math = Bitcoin::getMath();
         $outpoint = $this->outPoint;
         return $outpoint->getTxId()->getBinary() === str_pad('', 32, "\x00")
-            && $math->cmp($outpoint->getVout(), $math->hexDec('ffffffff')) === 0;
+            && $outpoint->getVout() == 0xffffffff;
     }
 
     /**
      * @return bool
      */
-    public function isFinal()
+    public function isFinal(): bool
     {
         $math = Bitcoin::getMath();
-        return $math->cmp($this->getSequence(), self::SEQUENCE_FINAL) === 0;
+        return $math->cmp(gmp_init($this->getSequence(), 10), gmp_init(self::SEQUENCE_FINAL, 10)) === 0;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isSequenceLockDisabled(): bool
+    {
+        if ($this->isCoinbase()) {
+            return true;
+        }
+
+        return ($this->sequence & self::SEQUENCE_LOCKTIME_DISABLE_FLAG) !== 0;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isLockedToTime(): bool
+    {
+        return !$this->isSequenceLockDisabled() && (($this->sequence & self::SEQUENCE_LOCKTIME_TYPE_FLAG) === self::SEQUENCE_LOCKTIME_TYPE_FLAG);
+    }
+
+    /**
+     * @return bool
+     */
+    public function isLockedToBlock(): bool
+    {
+        return !$this->isSequenceLockDisabled() && (($this->sequence & self::SEQUENCE_LOCKTIME_TYPE_FLAG) === 0);
+    }
+
+    /**
+     * @return int
+     */
+    public function getRelativeTimeLock(): int
+    {
+        if (!$this->isLockedToTime()) {
+            throw new \RuntimeException('Cannot decode time based locktime when disable flag set/timelock flag unset/tx is coinbase');
+        }
+
+        // Multiply by 512 to convert locktime to seconds
+        return ($this->sequence & self::SEQUENCE_LOCKTIME_MASK) * 512;
+    }
+
+    /**
+     * @return int
+     */
+    public function getRelativeBlockLock(): int
+    {
+        if (!$this->isLockedToBlock()) {
+            throw new \RuntimeException('Cannot decode block locktime when disable flag set/timelock flag set/tx is coinbase');
+        }
+
+        return $this->sequence & self::SEQUENCE_LOCKTIME_MASK;
     }
 
     /**
      * @return BufferInterface
      */
-    public function getBuffer()
+    public function getBuffer(): BufferInterface
     {
         return (new TransactionInputSerializer(new OutPointSerializer()))->serialize($this);
     }

@@ -1,57 +1,49 @@
 <?php
 
-namespace BitWasp\Bitcoin;
+declare(strict_types=1);
 
-use BitWasp\Bitcoin\Math\Math;
+namespace BitWasp\Bitcoin;
 
 class Locktime
 {
-    /**
-     * @var Math
-     */
-    private $math;
-
-    /**
-     * 0xffffffff
-     */
-    const INT_MAX = '4294967296';
+    const INT_MAX = 0xffffffff;
 
     /**
      * Maximum block height that can be used in locktime, as beyond
      * this is reserved for timestamp locktimes
      */
-    const BLOCK_MAX = '500000000';
+    const BLOCK_MAX = 500000000;
 
     /**
      * Maximum timestamp that can be encoded in locktime
      * (TIME_MAX + BLOCK_MAX = INT_MAX)
      */
-
-    const TIME_MAX = '3794967296';
+    const TIME_MAX = self::INT_MAX - self::BLOCK_MAX;
 
     /**
-     * @param Math $math
+     * @param int $nLockTime
+     * @return bool
      */
-    public function __construct(Math $math)
+    public function isLockedToBlock(int $nLockTime): bool
     {
-        $this->math = $math;
+        return $nLockTime > 0 && $nLockTime <= self::BLOCK_MAX;
     }
 
     /**
      * Convert a $timestamp to a locktime.
      * Max timestamp is 3794967296 - 04/04/2090 @ 5:34am (UTC)
      *
-     * @param int|string $timestamp
-     * @return int|string
+     * @param int $timestamp
+     * @return int
      * @throws \Exception
      */
-    public function fromTimestamp($timestamp)
+    public function fromTimestamp(int $timestamp): int
     {
-        if ($this->math->cmp($timestamp, self::TIME_MAX) > 0) {
+        if ($timestamp > self::TIME_MAX) {
             throw new \Exception('Timestamp out of range');
         }
 
-        $locktime = $this->math->add(self::BLOCK_MAX, $timestamp);
+        $locktime = self::BLOCK_MAX + $timestamp;
         return $locktime;
     }
 
@@ -61,21 +53,21 @@ class Locktime
      *  - Lock time appears to be in the block locktime range ( < Locktime::BLOCK_MAX )
      *  - When the lock time exceeds the max possible lock time ( > Locktime::INT_MAX )
      *
-     * @param int|string $lockTime
-     * @return int|string
+     * @param int $lockTime
+     * @return int
      * @throws \Exception
      */
-    public function toTimestamp($lockTime)
+    public function toTimestamp(int $lockTime): int
     {
-        if ($this->math->cmp($lockTime, self::BLOCK_MAX) <= 0) {
+        if ($lockTime <= self::BLOCK_MAX) {
             throw new \Exception('Lock time out of range for timestamp');
         }
 
-        if ($this->math->cmp($lockTime, self::INT_MAX) > 0) {
+        if ($lockTime > self::INT_MAX) {
             throw new \Exception('Lock time too large');
         }
 
-        $timestamp = $this->math->sub($lockTime, self::BLOCK_MAX);
+        $timestamp = $lockTime - self::BLOCK_MAX;
         return $timestamp;
     }
 
@@ -83,13 +75,13 @@ class Locktime
      * Convert $blockHeight to lock time. Doesn't convert anything really,
      * but does check the bounds of the given block height.
      *
-     * @param int|string $blockHeight
-     * @return int|string
+     * @param int $blockHeight
+     * @return int
      * @throws \Exception
      */
-    public function fromBlockHeight($blockHeight)
+    public function fromBlockHeight(int $blockHeight): int
     {
-        if ($this->math->cmp($blockHeight, self::BLOCK_MAX) > 0) {
+        if ($blockHeight > self::BLOCK_MAX) {
             throw new \Exception('This block height is too high');
         }
 
@@ -100,13 +92,13 @@ class Locktime
      * Convert locktime to block height tx is locked to. Doesn't convert anything
      * really, but does check the bounds of the supplied locktime.
      *
-     * @param int|string $lockTime
-     * @return int|string
+     * @param int $lockTime
+     * @return int
      * @throws \Exception
      */
-    public function toBlockHeight($lockTime)
+    public function toBlockHeight(int $lockTime): int
     {
-        if ($this->math->cmp($lockTime, self::BLOCK_MAX) > 0) {
+        if ($lockTime >= self::BLOCK_MAX) {
             throw new \Exception('This locktime is out of range for a block height');
         }
 

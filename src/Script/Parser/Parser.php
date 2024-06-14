@@ -1,9 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Script\Parser;
 
-use BitWasp\Bitcoin\Script\Opcodes;
 use BitWasp\Bitcoin\Math\Math;
+use BitWasp\Bitcoin\Script\Opcodes;
+use BitWasp\Bitcoin\Script\Script;
 use BitWasp\Bitcoin\Script\ScriptInterface;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\BufferInterface;
@@ -24,6 +27,11 @@ class Parser implements \Iterator
      * @var ScriptInterface
      */
     private $script;
+
+    /**
+     * @var int
+     */
+    private $count = 0;
 
     /**
      * @var int
@@ -62,13 +70,13 @@ class Parser implements \Iterator
         $this->data = $buffer->getBinary();
         $this->end = $buffer->getSize();
         $this->script = $script;
-        $this->empty = new Buffer('', 0, $math);
+        $this->empty = new Buffer('', 0);
     }
 
     /**
      * @return int
      */
-    public function getPosition()
+    public function getPosition(): int
     {
         return $this->position;
     }
@@ -78,7 +86,7 @@ class Parser implements \Iterator
      * @param integer $strSize
      * @return array|bool
      */
-    private function unpackSize($packFormat, $strSize)
+    private function unpackSize(string $packFormat, int $strSize)
     {
         if ($this->end - $this->position < $strSize) {
             return false;
@@ -95,9 +103,9 @@ class Parser implements \Iterator
      * @param int $ptr
      * @return Operation
      */
-    private function doNext($ptr)
+    private function doNext(int $ptr)
     {
-        if ($this->math->cmp($this->position, $this->end) >= 0) {
+        if ($this->position >= $this->end) {
             throw new \RuntimeException('Position exceeds end of script!');
         }
 
@@ -122,15 +130,40 @@ class Parser implements \Iterator
             }
 
             if ($dataSize > 0) {
-                $pushData = new Buffer(substr($this->data, $this->position, $dataSize), $dataSize, $this->math);
+                $pushData = new Buffer(substr($this->data, $this->position, $dataSize), $dataSize);
             }
 
             $this->position += $dataSize;
         }
 
         $this->array[$ptr] = new Operation($opCode, $pushData, $dataSize);
+        $this->count++;
 
         return $this->array[$ptr];
+    }
+
+    /**
+     * @param int $begin
+     * @param null|int $length
+     * @return Script
+     */
+    public function slice(int $begin, int $length = null)
+    {
+        if ($begin < 0) {
+            throw new \RuntimeException("Invalid start of script - cannot be negative or ");
+        }
+
+        $maxLength = $this->end - $begin;
+
+        if (null === $length) {
+            $length = $maxLength;
+        } else {
+            if ($length > $maxLength) {
+                throw new \RuntimeException("Cannot slice this much from script");
+            }
+        }
+
+        return new Script(new Buffer(substr($this->data, $begin, $length)));
     }
 
     /**
@@ -139,6 +172,7 @@ class Parser implements \Iterator
     public function rewind()
     {
         $this->execPtr = 0;
+        $this->position = 0;
     }
 
     /**
@@ -164,7 +198,7 @@ class Parser implements \Iterator
     }
 
     /**
-     * @return Operation
+     * @return Operation|null
      */
     public function next()
     {
@@ -188,7 +222,7 @@ class Parser implements \Iterator
     /**
      * @return Operation[]
      */
-    public function decode()
+    public function decode(): array
     {
         $result = [];
         foreach ($this as $operation) {
@@ -201,13 +235,18 @@ class Parser implements \Iterator
     /**
      * @return string
      */
-    public function getHumanReadable()
+    public function getHumanReadable(): string
     {
         return implode(' ', array_map(
             function (Operation $operation) {
-                return $operation->isPush()
-                    ? $operation->getData()->getHex()
-                    : $this->script->getOpcodes()->getOp($operation->getOp());
+                $op = $operation->getOp();
+                if ($op === Opcodes::OP_0 || $op === Opcodes::OP_1NEGATE || $op >= Opcodes::OP_1 && $op <= Opcodes::OP_16) {
+                    return $this->script->getOpcodes()->getOp($op);
+                } else if ($operation->isPush()) {
+                    return $operation->getData()->getHex();
+                } else {
+                    return $this->script->getOpcodes()->getOp($operation->getOp());
+                }
             },
             $this->decode()
         ));

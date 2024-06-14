@@ -1,8 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Crypto\EcAdapter;
 
+use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Key\PrivateKeySerializerInterface;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Key\PublicKeySerializerInterface;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Signature\CompactSignatureSerializerInterface;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Signature\DerSignatureSerializerInterface;
 
 class EcSerializer
 {
@@ -13,10 +20,10 @@ class EcSerializer
      * @var string[]
      */
     private static $serializerInterface = [
-        'BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Key\PrivateKeySerializerInterface',
-        'BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Key\PublicKeySerializerInterface',
-        'BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Signature\CompactSignatureSerializerInterface',
-        'BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Signature\DerSignatureSerializerInterface'
+        PrivateKeySerializerInterface::class,
+        PublicKeySerializerInterface::class,
+        CompactSignatureSerializerInterface::class,
+        DerSignatureSerializerInterface::class,
     ];
 
     /**
@@ -45,10 +52,10 @@ class EcSerializer
     private static $cache = [];
 
     /**
-     * @param $interface
-     * @return mixed
+     * @param string $interface
+     * @return string
      */
-    public static function getImplRelPath($interface)
+    public static function getImplRelPath(string $interface): string
     {
         if (0 === count(self::$map)) {
             if (!in_array($interface, self::$serializerInterface, true)) {
@@ -74,7 +81,7 @@ class EcSerializer
     /**
      * @return array
      */
-    public static function getImplPaths()
+    public static function getImplPaths(): array
     {
         return [
             'BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Adapter\EcAdapter' => 'BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\\',
@@ -84,9 +91,9 @@ class EcSerializer
 
     /**
      * @param EcAdapterInterface $adapter
-     * @return mixed
+     * @return string
      */
-    public static function getAdapterImplPath(EcAdapterInterface $adapter)
+    public static function getAdapterImplPath(EcAdapterInterface $adapter): string
     {
         $paths = static::getImplPaths();
         $class = get_class($adapter);
@@ -98,22 +105,27 @@ class EcSerializer
     }
 
     /**
+     * @param string $interface
+     * @param bool $useCache
      * @param EcAdapterInterface $adapter
-     * @param $interface
-     * @param bool|true $useCache
      * @return mixed
      */
-    public static function getSerializer(EcAdapterInterface $adapter, $interface, $useCache = true)
+    public static function getSerializer(string $interface, $useCache = true, EcAdapterInterface $adapter = null)
     {
-        if (isset(self::$cache[$interface])) {
-            return self::$cache[$interface];
+        if (null === $adapter) {
+            $adapter = Bitcoin::getEcAdapter();
+        }
+
+        $key = get_class($adapter) . ":" . $interface;
+        if (array_key_exists($key, self::$cache)) {
+            return self::$cache[$key];
         }
 
         $classPath = self::getAdapterImplPath($adapter) . self::getImplRelPath($interface);
         $class = new $classPath($adapter);
 
         if ($useCache && self::$useCache) {
-            self::$cache[$interface] = $class;
+            self::$cache[$key] = $class;
         }
 
         return $class;
@@ -125,5 +137,6 @@ class EcSerializer
     public static function disableCache()
     {
         self::$useCache = false;
+        self::$cache = [];
     }
 }

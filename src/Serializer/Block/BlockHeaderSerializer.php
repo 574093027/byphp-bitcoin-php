@@ -1,58 +1,66 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Serializer\Block;
 
-use BitWasp\Buffertools\Exceptions\ParserOutOfRange;
-use BitWasp\Buffertools\Parser;
 use BitWasp\Bitcoin\Block\BlockHeader;
 use BitWasp\Bitcoin\Block\BlockHeaderInterface;
-use BitWasp\Buffertools\TemplateFactory;
+use BitWasp\Bitcoin\Serializer\Types;
+use BitWasp\Buffertools\Buffer;
+use BitWasp\Buffertools\BufferInterface;
+use BitWasp\Buffertools\Exceptions\ParserOutOfRange;
+use BitWasp\Buffertools\Parser;
 
 class BlockHeaderSerializer
 {
     /**
-     * @param \BitWasp\Buffertools\BufferInterface|string $string
-     * @return BlockHeader
-     * @throws ParserOutOfRange
+     * @var \BitWasp\Buffertools\Types\Int32
      */
-    public function parse($string)
+    private $int32le;
+
+    /**
+     * @var \BitWasp\Buffertools\Types\ByteString
+     */
+    private $hash;
+
+    /**
+     * @var \BitWasp\Buffertools\Types\Uint32
+     */
+    private $uint32le;
+
+    public function __construct()
     {
-        return $this->fromParser(new Parser($string));
+        $this->hash = Types::bytestringle(32);
+        $this->uint32le = Types::uint32le();
+        $this->int32le = Types::int32le();
     }
 
     /**
-     * @return \BitWasp\Buffertools\Template
+     * @param BufferInterface $buffer
+     * @return BlockHeaderInterface
+     * @throws ParserOutOfRange
      */
-    public function getTemplate()
+    public function parse(BufferInterface $buffer): BlockHeaderInterface
     {
-        return (new TemplateFactory())
-            ->int32le()
-            ->bytestringle(32)
-            ->bytestringle(32)
-            ->uint32le()
-            ->bytestringle(4)
-            ->uint32le()
-            ->getTemplate();
+        return $this->fromParser(new Parser($buffer));
     }
 
     /**
      * @param Parser $parser
-     * @return BlockHeader
+     * @return BlockHeaderInterface
      * @throws ParserOutOfRange
      */
-    public function fromParser(Parser $parser)
+    public function fromParser(Parser $parser): BlockHeaderInterface
     {
-
         try {
-            list ($version, $prevHash, $merkleHash, $time, $nBits, $nonce) = $this->getTemplate()->parse($parser);
-
             return new BlockHeader(
-                $version,
-                $prevHash,
-                $merkleHash,
-                $time,
-                $nBits,
-                $nonce
+                (int) $this->int32le->read($parser),
+                $this->hash->read($parser),
+                $this->hash->read($parser),
+                (int) $this->uint32le->read($parser),
+                (int) $this->uint32le->read($parser),
+                (int) $this->uint32le->read($parser)
             );
         } catch (ParserOutOfRange $e) {
             throw new ParserOutOfRange('Failed to extract full block header from parser');
@@ -61,17 +69,17 @@ class BlockHeaderSerializer
 
     /**
      * @param BlockHeaderInterface $header
-     * @return \BitWasp\Buffertools\BufferInterface
+     * @return BufferInterface
      */
-    public function serialize(BlockHeaderInterface $header)
+    public function serialize(BlockHeaderInterface $header): BufferInterface
     {
-        return $this->getTemplate()->write([
-            $header->getVersion(),
-            $header->getPrevBlock(),
-            $header->getMerkleRoot(),
-            $header->getTimestamp(),
-            $header->getBits(),
-            $header->getNonce()
-        ]);
+        return new Buffer(
+            $this->int32le->write($header->getVersion()) .
+            $this->hash->write($header->getPrevBlock()) .
+            $this->hash->write($header->getMerkleRoot()) .
+            $this->uint32le->write($header->getTimestamp()) .
+            $this->uint32le->write($header->getBits()) .
+            $this->uint32le->write($header->getNonce())
+        );
     }
 }

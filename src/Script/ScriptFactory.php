@@ -1,29 +1,47 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Script;
 
 use BitWasp\Bitcoin\Bitcoin;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
 use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Script\Consensus\BitcoinConsensus;
+use BitWasp\Bitcoin\Script\Consensus\ConsensusInterface;
 use BitWasp\Bitcoin\Script\Consensus\NativeConsensus;
 use BitWasp\Bitcoin\Script\Factory\OutputScriptFactory;
-use BitWasp\Bitcoin\Script\Factory\P2shScriptFactory;
 use BitWasp\Bitcoin\Script\Factory\ScriptCreator;
-use BitWasp\Bitcoin\Script\Factory\ScriptInfoFactory;
-use BitWasp\Bitcoin\Script\Interpreter\InterpreterInterface;
+use BitWasp\Bitcoin\Script\Parser\Operation;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\BufferInterface;
 
 class ScriptFactory
 {
     /**
-     * @param BufferInterface|string $string
-     * @return Script
+     * @var OutputScriptFactory
      */
-    public static function fromHex($string)
+    private static $outputScriptFactory = null;
+
+    /**
+     * @param string $string
+     * @return ScriptInterface
+     * @throws \Exception
+     */
+    public static function fromHex(string $string): ScriptInterface
     {
-        return self::create($string instanceof BufferInterface ? $string : Buffer::hex($string))->getScript();
+        return self::fromBuffer(Buffer::hex($string));
+    }
+
+    /**
+     * @param BufferInterface $buffer
+     * @param Opcodes|null $opcodes
+     * @param Math|null $math
+     * @return ScriptInterface
+     */
+    public static function fromBuffer(BufferInterface $buffer, Opcodes $opcodes = null, Math $math = null): ScriptInterface
+    {
+        return self::create($buffer, $opcodes, $math)->getScript();
     }
 
     /**
@@ -32,89 +50,105 @@ class ScriptFactory
      * @param Math|null $math
      * @return ScriptCreator
      */
-    public static function create(BufferInterface $buffer = null, Opcodes $opcodes = null, Math $math = null)
+    public static function create(BufferInterface $buffer = null, Opcodes $opcodes = null, Math $math = null): ScriptCreator
     {
         return new ScriptCreator($math ?: Bitcoin::getMath(), $opcodes ?: new Opcodes(), $buffer);
+    }
+
+    /**
+     * Create a script consisting only of push-data operations.
+     * Suitable for a scriptSig.
+     *
+     * @param BufferInterface[] $buffers
+     * @return ScriptInterface
+     */
+    public static function pushAll(array $buffers): ScriptInterface
+    {
+        return self::sequence(array_map(function ($buffer) {
+            if (!($buffer instanceof BufferInterface)) {
+                throw new \RuntimeException('Script contained a non-push opcode');
+            }
+
+            $size = $buffer->getSize();
+            if ($size === 0) {
+                return Opcodes::OP_0;
+            }
+
+            $first = ord($buffer->getBinary()[0]);
+            if ($size === 1 && $first >= 1 && $first <= 16) {
+                return \BitWasp\Bitcoin\Script\encodeOpN($first);
+            } else {
+                return $buffer;
+            }
+        }, $buffers));
     }
 
     /**
      * @param int[]|\BitWasp\Bitcoin\Script\Interpreter\Number[]|BufferInterface[] $sequence
      * @return ScriptInterface
      */
-    public static function sequence(array $sequence)
+    public static function sequence(array $sequence): ScriptInterface
     {
         return self::create()->sequence($sequence)->getScript();
     }
 
     /**
+     * @param Operation[] $operations
+     * @return ScriptInterface
+     */
+    public static function fromOperations(array $operations): ScriptInterface
+    {
+        $sequence = [];
+        foreach ($operations as $operation) {
+            if (!($operation instanceof Operation)) {
+                throw new \RuntimeException("Invalid input to fromOperations");
+            }
+
+            $sequence[] = $operation->encode();
+        }
+
+        return self::sequence($sequence);
+    }
+
+    /**
      * @return OutputScriptFactory
      */
-    public static function scriptPubKey()
+    public static function scriptPubKey(): OutputScriptFactory
     {
-        return new OutputScriptFactory();
+        if (self::$outputScriptFactory === null) {
+            self::$outputScriptFactory = new OutputScriptFactory();
+        }
+
+        return self::$outputScriptFactory;
     }
 
     /**
-     * @param Opcodes|null $opcodes
-     * @return P2shScriptFactory
-     */
-    public static function p2sh(Opcodes $opcodes = null)
-    {
-        return new P2shScriptFactory(self::scriptPubKey(), $opcodes ?: new Opcodes());
-    }
-
-    /**
-     * @param ScriptInterface $script
-     * @return ScriptInfo\ScriptInfoInterface
-     */
-    public static function info(ScriptInterface $script)
-    {
-        return (new ScriptInfoFactory())->load($script);
-    }
-
-    /**
-     * @return int
-     */
-    public static function defaultFlags()
-    {
-        return
-            InterpreterInterface::VERIFY_P2SH | InterpreterInterface::VERIFY_STRICTENC | InterpreterInterface::VERIFY_DERSIG |
-            InterpreterInterface::VERIFY_LOW_S | InterpreterInterface::VERIFY_NULL_DUMMY | InterpreterInterface::VERIFY_SIGPUSHONLY |
-            InterpreterInterface::VERIFY_DISCOURAGE_UPGRADABLE_NOPS | InterpreterInterface::VERIFY_CLEAN_STACK |
-            InterpreterInterface::VERIFY_CHECKLOCKTIMEVERIFY | InterpreterInterface::VERIFY_WITNESS
-        ;
-    }
-
-    /**
-     * @param int|null $flags
      * @param EcAdapterInterface|null $ecAdapter
      * @return NativeConsensus
      */
-    public static function getNativeConsensus($flags, EcAdapterInterface $ecAdapter = null)
+    public static function getNativeConsensus(EcAdapterInterface $ecAdapter = null): NativeConsensus
     {
-        return new NativeConsensus($ecAdapter ?: Bitcoin::getEcAdapter(), $flags);
+        return new NativeConsensus($ecAdapter ?: Bitcoin::getEcAdapter());
     }
 
     /**
-     * @param int|null $flags
      * @return BitcoinConsensus
      */
-    public static function getBitcoinConsensus($flags)
+    public static function getBitcoinConsensus(): BitcoinConsensus
     {
-        return new BitcoinConsensus($flags);
+        return new BitcoinConsensus();
     }
 
     /**
-     * @param int|null $flags
      * @param EcAdapterInterface|null $ecAdapter
-     * @return \BitWasp\Bitcoin\Script\Consensus\ConsensusInterface
+     * @return ConsensusInterface
      */
-    public static function consensus($flags, EcAdapterInterface $ecAdapter = null)
+    public static function consensus(EcAdapterInterface $ecAdapter = null): ConsensusInterface
     {
         if (extension_loaded('bitcoinconsensus')) {
-            return self::getBitcoinConsensus($flags);
+            return self::getBitcoinConsensus();
         } else {
-            return self::getNativeConsensus($flags, $ecAdapter);
+            return self::getNativeConsensus($ecAdapter);
         }
     }
 }

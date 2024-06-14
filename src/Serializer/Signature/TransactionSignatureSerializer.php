@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Serializer\Signature;
 
 use BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Signature\DerSignatureSerializerInterface;
 use BitWasp\Bitcoin\Signature\TransactionSignature;
+use BitWasp\Bitcoin\Signature\TransactionSignatureInterface;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\BufferInterface;
-use BitWasp\Buffertools\Parser;
 
 class TransactionSignatureSerializer
 {
@@ -24,31 +26,31 @@ class TransactionSignatureSerializer
     }
 
     /**
-     * @param TransactionSignature $txSig
+     * @param TransactionSignatureInterface $txSig
      * @return BufferInterface
      */
-    public function serialize(TransactionSignature $txSig)
+    public function serialize(TransactionSignatureInterface $txSig): BufferInterface
     {
-        $sig = $this->sigSerializer->serialize($txSig->getSignature());
-        $parser = new Parser($sig->getHex());
-        $parser->writeBytes(1, Buffer::int($txSig->getHashType(), 1));
-        $buffer = $parser->getBuffer();
-        return $buffer;
+        return new Buffer($this->sigSerializer->serialize($txSig->getSignature())->getBinary() . pack('C', $txSig->getHashType()));
     }
 
     /**
-     * @param $string
-     * @return TransactionSignature
+     * @param BufferInterface $buffer
+     * @return TransactionSignatureInterface
+     * @throws \Exception
      */
-    public function parse($string)
+    public function parse(BufferInterface $buffer): TransactionSignatureInterface
     {
-        $buffer = (new Parser($string))->getBuffer();
-        $sig = $buffer->slice(0, $buffer->getSize() - 1);
-        $hashType = $buffer->slice(-1);
+        $adapter = $this->sigSerializer->getEcAdapter();
+
+        if ($buffer->getSize() < 1) {
+            throw new \RuntimeException("Empty signature");
+        }
+
         return new TransactionSignature(
-            $this->sigSerializer->getEcAdapter(),
-            $this->sigSerializer->parse($sig),
-            $hashType->getInt()
+            $adapter,
+            $this->sigSerializer->parse($buffer->slice(0, -1)),
+            (int) $buffer->slice(-1)->getInt()
         );
     }
 }

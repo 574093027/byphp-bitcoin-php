@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Crypto\EcAdapter\Impl\Secp256k1\Serializer\Key;
 
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\Secp256k1\Adapter\EcAdapter;
@@ -15,11 +17,6 @@ use BitWasp\Buffertools\Parser;
  */
 class PrivateKeySerializer implements PrivateKeySerializerInterface
 {
-    /**
-     * @var bool
-     */
-    private $haveNextCompressed = false;
-
     /**
      * @var EcAdapter
      */
@@ -37,54 +34,40 @@ class PrivateKeySerializer implements PrivateKeySerializerInterface
      * @param PrivateKey $privateKey
      * @return BufferInterface
      */
-    private function doSerialize(PrivateKey $privateKey)
+    private function doSerialize(PrivateKey $privateKey): BufferInterface
     {
-        return new Buffer($privateKey->getSecretBinary(), 32, $this->ecAdapter->getMath());
+        return new Buffer($privateKey->getSecretBinary(), 32);
     }
 
     /**
      * @param PrivateKeyInterface $privateKey
      * @return BufferInterface
      */
-    public function serialize(PrivateKeyInterface $privateKey)
+    public function serialize(PrivateKeyInterface $privateKey): BufferInterface
     {
         /** @var PrivateKey $privateKey */
         return $this->doSerialize($privateKey);
     }
 
     /**
-     * Tells the serializer the next key to be parsed should be compressed.
-     *
-     * @return $this
-     */
-    public function setNextCompressed()
-    {
-        $this->haveNextCompressed = true;
-        return $this;
-    }
-
-    /**
      * @param Parser $parser
-     * @return PrivateKey
-     * @throws \BitWasp\Buffertools\Exceptions\ParserOutOfRange
+     * @param bool $compressed
+     * @return PrivateKeyInterface
+     * @throws \Exception
      */
-    public function fromParser(Parser $parser)
+    public function fromParser(Parser $parser, bool $compressed): PrivateKeyInterface
     {
-        $compressed = $this->haveNextCompressed;
-        $this->haveNextCompressed = false;
-
-        return $this->ecAdapter->getPrivateKey(
-            $parser->readBytes(32)->getInt(),
-            $compressed
-        );
+        return $this->ecAdapter->getPrivateKey($parser->readBytes(32)->getGmp(), $compressed);
     }
 
     /**
-     * @param \BitWasp\Buffertools\BufferInterface|string $data
-     * @return PrivateKey
+     * @param BufferInterface $data
+     * @param bool $compressed
+     * @return PrivateKeyInterface
+     * @throws \Exception
      */
-    public function parse($data)
+    public function parse(BufferInterface $data, bool $compressed): PrivateKeyInterface
     {
-        return $this->fromParser(new Parser($data, $this->ecAdapter->getMath()));
+        return $this->fromParser(new Parser($data), $compressed);
     }
 }

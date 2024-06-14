@@ -1,18 +1,20 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Block;
 
+use BitWasp\Bitcoin\Exceptions\MerkleTreeEmpty;
 use BitWasp\Bitcoin\Math\Math;
-use BitWasp\Bitcoin\Collection\Transaction\TransactionCollection;
+use BitWasp\Bitcoin\Transaction\TransactionInterface;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\BufferInterface;
-use BitWasp\Bitcoin\Exceptions\MerkleTreeEmpty;
 use Pleo\Merkle\FixedSizeTree;
 
 class MerkleRoot
 {
     /**
-     * @var TransactionCollection
+     * @var TransactionInterface[]
      */
     private $transactions;
 
@@ -30,9 +32,9 @@ class MerkleRoot
      * Instantiate the class when given a block
      *
      * @param Math $math
-     * @param TransactionCollection $txCollection
+     * @param TransactionInterface[] $txCollection
      */
-    public function __construct(Math $math, TransactionCollection $txCollection)
+    public function __construct(Math $math, array $txCollection)
     {
         $this->math = $math;
         $this->transactions = $txCollection;
@@ -43,7 +45,7 @@ class MerkleRoot
      * @return BufferInterface
      * @throws MerkleTreeEmpty
      */
-    public function calculateHash(callable $hashFunction = null)
+    public function calculateHash(callable $hashFunction = null): BufferInterface
     {
         if ($this->lastHash instanceof BufferInterface) {
             return $this->lastHash;
@@ -54,7 +56,6 @@ class MerkleRoot
         };
 
         $txCount = count($this->transactions);
-
         if ($txCount === 0) {
             // TODO: Probably necessary. Should always have a coinbase at least.
             throw new MerkleTreeEmpty('Cannot compute Merkle root of an empty tree');
@@ -74,7 +75,7 @@ class MerkleRoot
             }
 
             // Check if we need to repeat the last hash (odd number of transactions)
-            if (!$this->math->isEven($txCount)) {
+            if (!($txCount % 2 === 0)) {
                 $tree->set($txCount, $last);
             }
 

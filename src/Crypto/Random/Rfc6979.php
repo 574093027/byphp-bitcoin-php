@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Crypto\Random;
 
 use BitWasp\Bitcoin\Crypto\EcAdapter\Adapter\EcAdapterInterface;
@@ -7,8 +9,8 @@ use BitWasp\Bitcoin\Crypto\EcAdapter\Key\PrivateKeyInterface;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\BufferInterface;
 use Mdanter\Ecc\Crypto\Key\PrivateKey as MdPrivateKey;
-use Mdanter\Ecc\Random\HmacRandomNumberGenerator;
 use Mdanter\Ecc\Random\RandomGeneratorFactory;
+use Mdanter\Ecc\Random\RandomNumberGeneratorInterface;
 
 class Rfc6979 implements RbgInterface
 {
@@ -19,7 +21,7 @@ class Rfc6979 implements RbgInterface
     private $ecAdapter;
 
     /**
-     * @var HmacRandomNumberGenerator
+     * @var RandomNumberGeneratorInterface
      */
     private $hmac;
 
@@ -33,20 +35,20 @@ class Rfc6979 implements RbgInterface
         EcAdapterInterface $ecAdapter,
         PrivateKeyInterface $privateKey,
         BufferInterface $messageHash,
-        $algo = 'sha256'
+        string $algo = 'sha256'
     ) {
-        $mdPk = new MdPrivateKey($ecAdapter->getMath(), $ecAdapter->getGenerator(), $privateKey->getInt());
+        $mdPk = new MdPrivateKey($ecAdapter->getMath(), $ecAdapter->getGenerator(), gmp_init($privateKey->getInt(), 10));
         $this->ecAdapter = $ecAdapter;
-        $this->hmac = RandomGeneratorFactory::getHmacRandomGenerator($mdPk, $messageHash->getInt(), $algo);
+        $this->hmac = RandomGeneratorFactory::getHmacRandomGenerator($mdPk, gmp_init($messageHash->getInt(), 10), $algo);
     }
 
     /**
      * @param int $bytes
-     * @return Buffer
+     * @return BufferInterface
      */
-    public function bytes($bytes)
+    public function bytes(int $bytes): BufferInterface
     {
-        $integer = $this->hmac->generate($this->ecAdapter->getGenerator()->getOrder());
-        return Buffer::int($integer, $bytes, $this->ecAdapter->getMath());
+        $integer = $this->hmac->generate($this->ecAdapter->getOrder());
+        return Buffer::int(gmp_strval($integer, 10), $bytes);
     }
 }

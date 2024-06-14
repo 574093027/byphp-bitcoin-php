@@ -1,0 +1,365 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="f0e205bc-bda5-4b33-9228-5b678ca89f2f" name="变更" comment="fix up">
+      <change beforePath="$PROJECT_DIR$/.gitattributes" beforeDir="false" afterPath="$PROJECT_DIR$/.gitattributes" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/BIPS.md" beforeDir="false" afterPath="$PROJECT_DIR$/BIPS.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CONTRIBUTING.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/build.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/composer.json" beforeDir="false" afterPath="$PROJECT_DIR$/composer.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/doc/Factory Classes.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/doc/Introduction.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/doc/Script.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/doc/Serialization.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/doc/Transaction.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/doc/Types.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/examples/bip32.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/examples/bip39.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/examples/bip70.fetch.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/examples/bip70.payment.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/examples/bip70.start.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/examples/bitcoind.block.parser.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/examples/decode.txout.proof.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/examples/decode58.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/examples/hd.multisig.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/examples/offlinetx.p2pkh.testnet.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/examples/offlinetx.p2sh.hex.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/examples/privatekey.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/examples/rpc.getblock.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/examples/script.decode.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/examples/script.simple.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/examples/signatureValidation.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/examples/signedmessage.create.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/examples/signedmessage.verify.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/examples/transactionBuilder.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/examples/tx.fund.p2sh.p2wpkh.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/examples/tx.fund.p2sh.p2wsh.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/examples/tx.fund.p2wpkh.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/examples/tx.fund.p2wsh.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/examples/tx.spend.p2sh.p2wpkh.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/examples/tx.spend.p2sh.p2wsh.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/examples/tx.spend.p2wpkh.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/examples/tx.spend.p2wsh.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/release-notes.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Address/Address.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Address/Address.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Address/AddressFactory.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Address/AddressInterface.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Address/AddressInterface.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Address/PayToPubKeyHashAddress.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Address/PayToPubKeyHashAddress.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Address/ScriptHashAddress.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Address/ScriptHashAddress.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Address/WitnessPubKeyHashAddress.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Address/WitnessScriptHash.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Amount.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Amount.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Base58.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Base58.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Bitcoin.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Bitcoin.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Block/Block.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Block/Block.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Block/BlockFactory.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Block/BlockFactory.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Block/BlockHeader.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Block/BlockHeader.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Block/BlockHeaderFactory.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Block/BlockHeaderFactory.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Block/BlockHeaderInterface.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Block/BlockHeaderInterface.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Block/BlockInterface.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Block/BlockInterface.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Block/FilteredBlock.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Block/FilteredBlock.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Block/MerkleRoot.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Block/MerkleRoot.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Block/PartialMerkleTree.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Block/PartialMerkleTree.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Bloom/BloomFilter.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Bloom/BloomFilter.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Chain/BlockLocator.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Chain/BlockLocator.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Chain/Params.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Chain/Params.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Chain/ParamsInterface.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Chain/ParamsInterface.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Chain/ProofOfWork.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Chain/ProofOfWork.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Collection/CollectionInterface.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Collection/CollectionInterface.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Collection/Generic/Set.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Collection/MutableCollection.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Collection/StaticCollection.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Collection/StaticCollection.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Collection/Transaction/TransactionCollection.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Collection/Transaction/TransactionInputCollection.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Collection/Transaction/TransactionOutputCollection.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Collection/Transaction/TransactionWitnessCollection.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Crypto/EcAdapter/Adapter/EcAdapterInterface.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Crypto/EcAdapter/Adapter/EcAdapterInterface.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Crypto/EcAdapter/EcAdapterFactory.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Crypto/EcAdapter/EcAdapterFactory.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Crypto/EcAdapter/EcSerializer.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Crypto/EcAdapter/EcSerializer.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Crypto/EcAdapter/Impl/PhpEcc/Adapter/EcAdapter.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Crypto/EcAdapter/Impl/PhpEcc/Adapter/EcAdapter.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Crypto/EcAdapter/Impl/PhpEcc/Key/PrivateKey.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Crypto/EcAdapter/Impl/PhpEcc/Key/PrivateKey.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Crypto/EcAdapter/Impl/PhpEcc/Key/PublicKey.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Crypto/EcAdapter/Impl/PhpEcc/Key/PublicKey.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Crypto/EcAdapter/Impl/PhpEcc/Serializer/Key/PrivateKeySerializer.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Crypto/EcAdapter/Impl/PhpEcc/Serializer/Key/PrivateKeySerializer.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Crypto/EcAdapter/Impl/PhpEcc/Serializer/Key/PublicKeySerializer.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Crypto/EcAdapter/Impl/PhpEcc/Serializer/Key/PublicKeySerializer.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Crypto/EcAdapter/Impl/PhpEcc/Serializer/Signature/CompactSignatureSerializer.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Crypto/EcAdapter/Impl/PhpEcc/Serializer/Signature/CompactSignatureSerializer.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Crypto/EcAdapter/Impl/PhpEcc/Serializer/Signature/DerSignatureSerializer.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Crypto/EcAdapter/Impl/PhpEcc/Serializer/Signature/DerSignatureSerializer.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Crypto/EcAdapter/Impl/PhpEcc/Signature/CompactSignature.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Crypto/EcAdapter/Impl/PhpEcc/Signature/CompactSignature.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Crypto/EcAdapter/Impl/PhpEcc/Signature/CompactSignatureInterface.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Crypto/EcAdapter/Impl/PhpEcc/Signature/CompactSignatureInterface.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Crypto/EcAdapter/Impl/PhpEcc/Signature/Signature.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Crypto/EcAdapter/Impl/PhpEcc/Signature/Signature.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Crypto/EcAdapter/Impl/PhpEcc/Signature/SignatureInterface.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Crypto/EcAdapter/Impl/PhpEcc/Signature/SignatureInterface.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Crypto/EcAdapter/Impl/Secp256k1/Adapter/EcAdapter.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Crypto/EcAdapter/Impl/Secp256k1/Adapter/EcAdapter.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Crypto/EcAdapter/Impl/Secp256k1/Key/PrivateKey.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Crypto/EcAdapter/Impl/Secp256k1/Key/PrivateKey.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Crypto/EcAdapter/Impl/Secp256k1/Key/PublicKey.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Crypto/EcAdapter/Impl/Secp256k1/Key/PublicKey.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Crypto/EcAdapter/Impl/Secp256k1/Serializer/Key/PrivateKeySerializer.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Crypto/EcAdapter/Impl/Secp256k1/Serializer/Key/PrivateKeySerializer.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Crypto/EcAdapter/Impl/Secp256k1/Serializer/Key/PublicKeySerializer.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Crypto/EcAdapter/Impl/Secp256k1/Serializer/Key/PublicKeySerializer.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Crypto/EcAdapter/Impl/Secp256k1/Serializer/Signature/CompactSignatureSerializer.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Crypto/EcAdapter/Impl/Secp256k1/Serializer/Signature/CompactSignatureSerializer.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Crypto/EcAdapter/Impl/Secp256k1/Serializer/Signature/DerSignatureSerializer.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Crypto/EcAdapter/Impl/Secp256k1/Serializer/Signature/DerSignatureSerializer.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Crypto/EcAdapter/Impl/Secp256k1/Signature/CompactSignature.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Crypto/EcAdapter/Impl/Secp256k1/Signature/CompactSignature.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Crypto/EcAdapter/Impl/Secp256k1/Signature/CompactSignatureInterface.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Crypto/EcAdapter/Impl/Secp256k1/Signature/CompactSignatureInterface.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Crypto/EcAdapter/Impl/Secp256k1/Signature/Signature.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Crypto/EcAdapter/Impl/Secp256k1/Signature/Signature.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Crypto/EcAdapter/Impl/Secp256k1/Signature/SignatureInterface.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Crypto/EcAdapter/Impl/Secp256k1/Signature/SignatureInterface.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Crypto/EcAdapter/Key/Key.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Crypto/EcAdapter/Key/Key.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Crypto/EcAdapter/Key/KeyInterface.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Crypto/EcAdapter/Key/KeyInterface.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Crypto/EcAdapter/Key/PrivateKeyInterface.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Crypto/EcAdapter/Key/PrivateKeyInterface.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Crypto/EcAdapter/Key/PublicKeyInterface.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Crypto/EcAdapter/Key/PublicKeyInterface.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Crypto/EcAdapter/Serializer/Key/PrivateKeySerializerInterface.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Crypto/EcAdapter/Serializer/Key/PrivateKeySerializerInterface.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Crypto/EcAdapter/Serializer/Key/PublicKeySerializerInterface.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Crypto/EcAdapter/Serializer/Key/PublicKeySerializerInterface.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Crypto/EcAdapter/Serializer/Signature/CompactSignatureSerializerInterface.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Crypto/EcAdapter/Serializer/Signature/CompactSignatureSerializerInterface.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Crypto/EcAdapter/Serializer/Signature/DerSignatureSerializerInterface.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Crypto/EcAdapter/Serializer/Signature/DerSignatureSerializerInterface.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Crypto/EcAdapter/Signature/CompactSignatureInterface.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Crypto/EcAdapter/Signature/CompactSignatureInterface.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Crypto/EcAdapter/Signature/SignatureInterface.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Crypto/EcAdapter/Signature/SignatureInterface.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Crypto/Hash.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Crypto/Hash.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Crypto/Random/Random.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Crypto/Random/Random.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Crypto/Random/RbgInterface.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Crypto/Random/RbgInterface.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Crypto/Random/Rfc6979.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Crypto/Random/Rfc6979.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Exceptions/InsufficientEntropy.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Key/Deterministic/ElectrumKey.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Key/Deterministic/ElectrumKey.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Key/Deterministic/ElectrumKeyFactory.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Key/Deterministic/HierarchicalKey.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Key/Deterministic/HierarchicalKey.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Key/Deterministic/HierarchicalKeyFactory.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Key/Deterministic/HierarchicalKeySequence.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Key/Deterministic/HierarchicalKeySequence.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Key/Deterministic/MultisigHD.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Key/Deterministic/MultisigHD.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Key/PrivateKeyFactory.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Key/PublicKeyFactory.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Locktime.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Locktime.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Math/BinaryMath.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Math/Math.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Math/Math.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/MessageSigner/MessageSigner.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/MessageSigner/MessageSigner.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/MessageSigner/SignedMessage.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/MessageSigner/SignedMessage.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Mnemonic/Bip39/Bip39Mnemonic.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Mnemonic/Bip39/Bip39Mnemonic.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Mnemonic/Bip39/Bip39SeedGenerator.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Mnemonic/Bip39/Bip39SeedGenerator.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Mnemonic/Bip39/Bip39WordListInterface.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Mnemonic/Bip39/Bip39WordListInterface.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Mnemonic/Bip39/Wordlist/EnglishWordList.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Mnemonic/Bip39/Wordlist/EnglishWordList.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Mnemonic/Bip39/Wordlist/JapaneseWordList.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Mnemonic/Bip39/Wordlist/JapaneseWordList.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Mnemonic/Electrum/ElectrumMnemonic.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Mnemonic/Electrum/ElectrumMnemonic.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Mnemonic/Electrum/ElectrumWordListInterface.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Mnemonic/Electrum/ElectrumWordListInterface.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Mnemonic/Electrum/Wordlist/EnglishWordList.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Mnemonic/Electrum/Wordlist/EnglishWordList.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Mnemonic/MnemonicFactory.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Mnemonic/MnemonicFactory.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Mnemonic/MnemonicInterface.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Mnemonic/MnemonicInterface.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Mnemonic/WordList.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Mnemonic/WordList.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Mnemonic/WordListInterface.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Mnemonic/WordListInterface.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Network/Network.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Network/Network.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Network/NetworkFactory.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Network/NetworkFactory.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Network/NetworkInterface.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Network/NetworkInterface.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/PaymentProtocol/PaymentHandler.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/PaymentProtocol/PaymentRequestBuilder.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/PaymentProtocol/PaymentRequestSigner.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/PaymentProtocol/PaymentRequestVerifier.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/PaymentProtocol/Protobufs/Output.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/PaymentProtocol/Protobufs/Payment.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/PaymentProtocol/Protobufs/PaymentACK.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/PaymentProtocol/Protobufs/PaymentDetails.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/PaymentProtocol/Protobufs/PaymentRequest.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/PaymentProtocol/Protobufs/X509Certificates.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/PaymentProtocol/Protobufs/protobuf.proto" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Script/Classifier/OutputClassifier.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Script/Classifier/OutputClassifier.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Script/Consensus/BitcoinConsensus.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Script/Consensus/BitcoinConsensus.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Script/Consensus/ConsensusInterface.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Script/Consensus/ConsensusInterface.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Script/Consensus/NativeConsensus.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Script/Consensus/NativeConsensus.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Script/Factory/OutputScriptFactory.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Script/Factory/OutputScriptFactory.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Script/Factory/P2shScriptFactory.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Script/Factory/ScriptCreator.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Script/Factory/ScriptCreator.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Script/Factory/ScriptInfoFactory.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Script/Interpreter/Checker.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Script/Interpreter/Checker.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Script/Interpreter/Interpreter.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Script/Interpreter/Interpreter.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Script/Interpreter/InterpreterInterface.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Script/Interpreter/InterpreterInterface.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Script/Interpreter/Number.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Script/Interpreter/Number.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Script/Interpreter/Stack.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Script/Interpreter/Stack.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Script/Interpreter/StackInterface.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Script/Interpreter/StackInterface.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Script/Opcodes.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Script/Opcodes.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Script/P2shScript.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Script/P2shScript.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Script/Parser/Operation.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Script/Parser/Operation.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Script/Parser/Parser.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Script/Parser/Parser.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Script/Script.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Script/Script.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Script/ScriptFactory.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Script/ScriptFactory.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Script/ScriptInfo/Multisig.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Script/ScriptInfo/Multisig.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Script/ScriptInfo/PayToPubkey.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Script/ScriptInfo/PayToPubkey.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Script/ScriptInfo/PayToPubkeyHash.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Script/ScriptInfo/PayToPubkeyHash.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Script/ScriptInfo/ScriptInfoInterface.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Script/ScriptInterface.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Script/ScriptInterface.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Script/ScriptWitness.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Script/ScriptWitness.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Script/ScriptWitnessInterface.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Script/ScriptWitnessInterface.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Script/WitnessProgram.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Script/WitnessProgram.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Script/functions.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Script/functions.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Serializable.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Serializable.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/SerializableInterface.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/SerializableInterface.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Serializer/Block/BitcoindBlockSerializer.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Serializer/Block/BitcoindBlockSerializer.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Serializer/Block/BlockHeaderSerializer.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Serializer/Block/BlockHeaderSerializer.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Serializer/Block/BlockSerializer.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Serializer/Block/BlockSerializer.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Serializer/Block/BlockSerializerInterface.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Serializer/Block/BlockSerializerInterface.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Serializer/Block/FilteredBlockSerializer.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Serializer/Block/FilteredBlockSerializer.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Serializer/Block/PartialMerkleTreeSerializer.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Serializer/Block/PartialMerkleTreeSerializer.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Serializer/Bloom/BloomFilterSerializer.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Serializer/Bloom/BloomFilterSerializer.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Serializer/Chain/BlockLocatorSerializer.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Serializer/Chain/BlockLocatorSerializer.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Serializer/Key/HierarchicalKey/ExtendedKeySerializer.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Serializer/Key/HierarchicalKey/ExtendedKeySerializer.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Serializer/Key/HierarchicalKey/HexExtendedKeySerializer.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Serializer/Key/PrivateKey/WifPrivateKeySerializer.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Serializer/Key/PrivateKey/WifPrivateKeySerializer.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Serializer/MessageSigner/SignedMessageSerializer.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Serializer/MessageSigner/SignedMessageSerializer.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Serializer/Script/ScriptWitnessSerializer.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Serializer/Script/ScriptWitnessSerializer.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Serializer/Signature/TransactionSignatureSerializer.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Serializer/Signature/TransactionSignatureSerializer.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Serializer/Transaction/OldTransactionSerializer.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Serializer/Transaction/OutPointSerializer.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Serializer/Transaction/OutPointSerializer.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Serializer/Transaction/OutPointSerializerInterface.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Serializer/Transaction/OutPointSerializerInterface.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Serializer/Transaction/TransactionInputSerializer.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Serializer/Transaction/TransactionInputSerializer.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Serializer/Transaction/TransactionOutputSerializer.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Serializer/Transaction/TransactionOutputSerializer.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Serializer/Transaction/TransactionSerializer.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Serializer/Transaction/TransactionSerializer.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Serializer/Transaction/TransactionSerializerInterface.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Serializer/Transaction/TransactionSerializerInterface.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Signature/SignatureFactory.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Signature/SignatureFactory.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Signature/SignatureSort.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Signature/SignatureSort.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Signature/SignatureSortInterface.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Signature/SignatureSortInterface.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Signature/TransactionSignature.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Signature/TransactionSignature.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Signature/TransactionSignatureFactory.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Signature/TransactionSignatureFactory.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Signature/TransactionSignatureInterface.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Signature/TransactionSignatureInterface.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Transaction/Bip69/Bip69.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Transaction/Bip69/Bip69.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Transaction/Factory/InputSigner.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Transaction/Factory/InputSigner.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Transaction/Factory/SigValues.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Transaction/Factory/SigValues.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Transaction/Factory/Signer.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Transaction/Factory/Signer.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Transaction/Factory/TxBuilder.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Transaction/Factory/TxBuilder.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Transaction/Mutator/InputCollectionMutator.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Transaction/Mutator/InputCollectionMutator.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Transaction/Mutator/InputMutator.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Transaction/Mutator/InputMutator.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Transaction/Mutator/OutputCollectionMutator.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Transaction/Mutator/OutputCollectionMutator.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Transaction/Mutator/OutputMutator.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Transaction/Mutator/OutputMutator.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Transaction/Mutator/TxMutator.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Transaction/Mutator/TxMutator.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Transaction/Mutator/WitnessCollectionMutator.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Transaction/Mutator/WitnessCollectionMutator.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Transaction/OutPoint.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Transaction/OutPoint.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Transaction/OutPointInterface.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Transaction/OutPointInterface.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Transaction/SignatureHash/Hasher.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Transaction/SignatureHash/Hasher.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Transaction/SignatureHash/SigHashInterface.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Transaction/SignatureHash/SigHashInterface.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Transaction/SignatureHash/V1Hasher.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Transaction/SignatureHash/V1Hasher.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Transaction/Transaction.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Transaction/Transaction.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Transaction/TransactionFactory.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Transaction/TransactionFactory.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Transaction/TransactionInput.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Transaction/TransactionInput.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Transaction/TransactionInputInterface.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Transaction/TransactionInputInterface.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Transaction/TransactionInterface.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Transaction/TransactionInterface.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Transaction/TransactionOutput.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Transaction/TransactionOutput.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Transaction/TransactionOutputInterface.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Transaction/TransactionOutputInterface.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Transaction/Validator.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Transaction/ValidatorInterface.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Uri.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Uri.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Utxo/Utxo.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Utxo/Utxo.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Utxo/UtxoInterface.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/Utxo/UtxoInterface.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/stubs/BitcoinConsensusStubs.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stubs/Secp256k1Stubs.php" beforeDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ComposerSettings" doNotAsk="true" synchronizationState="SYNCHRONIZE">
+    <pharConfigPath>$PROJECT_DIR$/composer.json</pharConfigPath>
+    <execution />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitToolBoxStore">
+    <option name="projectConfigVersion" value="5" />
+  </component>
+  <component name="ProjectId" id="2hRWemFELMl6rDWtMIX7cywyUbZ" />
+  <component name="ProjectViewState">
+    <option name="autoscrollFromSource" value="true" />
+    <option name="autoscrollToSource" value="true" />
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="node.js.detected.package.eslint" value="true" />
+    <property name="node.js.detected.package.tslint" value="true" />
+    <property name="node.js.selected.package.eslint" value="(autodetect)" />
+    <property name="node.js.selected.package.tslint" value="(autodetect)" />
+    <property name="nodejs_package_manager_path" value="npm" />
+    <property name="vue.rearranger.settings.migration" value="true" />
+  </component>
+  <component name="RunManager">
+    <configuration name="bip39.php" type="PhpLocalRunConfigurationType" factoryName="PHP Console" temporary="true" path="$PROJECT_DIR$/examples/bip39.php">
+      <CommandLine>
+        <PhpTestInterpreterSettings>
+          <option name="interpreterName" value="PHP 8.0.2" />
+        </PhpTestInterpreterSettings>
+      </CommandLine>
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="PHP 脚本.bip39.php" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="应用程序级" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="默认任务">
+      <changelist id="f0e205bc-bda5-4b33-9228-5b678ca89f2f" name="变更" comment="" />
+      <created>1717557468024</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1717557468024</updated>
+      <workItem from="1717557469260" duration="4204000" />
+      <workItem from="1718264938595" duration="233000" />
+      <workItem from="1718342662956" duration="2075000" />
+    </task>
+    <task id="LOCAL-00001" summary="fix up">
+      <created>1717557528123</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1717557528123</updated>
+    </task>
+    <task id="LOCAL-00002" summary="fix up">
+      <created>1717557882135</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1717557882135</updated>
+    </task>
+    <task id="LOCAL-00003" summary="fix up">
+      <created>1717558023908</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1717558023908</updated>
+    </task>
+    <task id="LOCAL-00004" summary="fix up">
+      <created>1717559689148</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1717559689148</updated>
+    </task>
+    <task id="LOCAL-00005" summary="fix up">
+      <created>1717562380835</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1717562380835</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="oldMeFiltersMigrated" value="true" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="fix up" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix up" />
+  </component>
+</project>

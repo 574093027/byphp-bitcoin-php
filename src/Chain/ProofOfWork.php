@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Chain;
 
 use BitWasp\Bitcoin\Block\BlockHeaderInterface;
@@ -33,48 +35,44 @@ class ProofOfWork
     }
 
     /**
-     * @param BufferInterface $bits
-     * @return int|string
+     * @param int $bits
+     * @return \GMP
      */
-    public function getTarget(BufferInterface $bits)
+    public function getTarget(int $bits): \GMP
     {
         $negative = false;
         $overflow = false;
-        return $this->math->writeCompact($bits->getInt(), $negative, $overflow);
+        return $this->math->decodeCompact($bits, $negative, $overflow);
     }
 
     /**
-     * @return int|string
+     * @return \GMP
      */
-    public function getMaxTarget()
+    public function getMaxTarget(): \GMP
     {
-        return $this->getTarget(Buffer::int($this->params->powBitsLimit(), 4, $this->math));
+        return $this->getTarget($this->params->powBitsLimit());
     }
 
     /**
-     * @param BufferInterface $bits
+     * @param int $bits
      * @return BufferInterface
      */
-    public function getTargetHash(BufferInterface $bits)
+    public function getTargetHash(int $bits): BufferInterface
     {
-        return Buffer::int(
-            $this->getTarget($bits),
-            32,
-            $this->math
-        );
+        return Buffer::int(gmp_strval($this->getTarget($bits), 10), 32);
     }
 
     /**
-     * @param BufferInterface $bits
+     * @param int $bits
      * @return string
      */
-    public function getDifficulty(BufferInterface $bits)
+    public function getDifficulty(int $bits): string
     {
         $target = $this->getTarget($bits);
         $lowest = $this->getMaxTarget();
-        $lowest = $this->math->mul($lowest, $this->math->pow(10, self::DIFF_PRECISION));
+        $lowest = $this->math->mul($lowest, $this->math->pow(gmp_init(10, 10), self::DIFF_PRECISION));
         
-        $difficulty = str_pad($this->math->div($lowest, $target), self::DIFF_PRECISION + 1, '0', STR_PAD_LEFT);
+        $difficulty = str_pad($this->math->toString($this->math->div($lowest, $target)), self::DIFF_PRECISION + 1, '0', STR_PAD_LEFT);
         
         $intPart = substr($difficulty, 0, 0 - self::DIFF_PRECISION);
         $decPart = substr($difficulty, 0 - self::DIFF_PRECISION, self::DIFF_PRECISION);
@@ -84,20 +82,21 @@ class ProofOfWork
 
     /**
      * @param BufferInterface $hash
-     * @param int|string $nBits
+     * @param int $nBits
      * @return bool
      */
-    public function check(BufferInterface $hash, $nBits)
+    public function checkPow(BufferInterface $hash, int $nBits): bool
     {
         $negative = false;
         $overflow = false;
-        $target = $this->math->writeCompact($nBits, $negative, $overflow);
-        if ($negative || $overflow || $this->math->cmp($target, 0) === 0 ||  $this->math->cmp($target, $this->getMaxTarget()) > 0) {
+        
+        $target = $this->math->decodeCompact($nBits, $negative, $overflow);
+        if ($negative || $overflow || $this->math->cmp($target, gmp_init(0)) === 0 ||  $this->math->cmp($target, $this->getMaxTarget()) > 0) {
             throw new \RuntimeException('nBits below minimum work');
         }
 
-        if ($this->math->cmp($hash->getInt(), $target) > 0) {
-            throw new \RuntimeException("Hash doesn't match nBits");
+        if ($this->math->cmp($hash->getGmp(), $target) > 0) {
+            return false;
         }
 
         return true;
@@ -108,17 +107,18 @@ class ProofOfWork
      * @return bool
      * @throws \Exception
      */
-    public function checkHeader(BlockHeaderInterface $header)
+    public function checkHeader(BlockHeaderInterface $header): bool
     {
-        return $this->check($header->getHash(), $header->getBits()->getInt());
+        return $this->checkPow($header->getHash(), $header->getBits());
     }
 
     /**
-     * @param BufferInterface $bits
-     * @return int|string
+     * @param int $bits
+     * @return \GMP
      */
-    public function getWork(BufferInterface $bits)
+    public function getWork(int $bits): \GMP
     {
-        return bcdiv(self::POW_2_256, $this->getTarget($bits));
+        $target = gmp_strval($this->getTarget($bits), 10);
+        return gmp_init(bcdiv(self::POW_2_256, $target), 10);
     }
 }

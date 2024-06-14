@@ -3,17 +3,17 @@
 namespace BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Serializer\Signature;
 
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Adapter\EcAdapter;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Signature\CompactSignature;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Serializer\Signature\CompactSignatureSerializerInterface;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Signature\CompactSignatureInterface;
 use BitWasp\Buffertools\BufferInterface;
-use BitWasp\Buffertools\Parser;
 use BitWasp\Buffertools\Exceptions\ParserOutOfRange;
-use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\PhpEcc\Signature\CompactSignature;
+use BitWasp\Buffertools\Parser;
+use BitWasp\Buffertools\Template;
 use BitWasp\Buffertools\TemplateFactory;
 
 class CompactSignatureSerializer implements CompactSignatureSerializerInterface
 {
-
     /**
      * @var EcAdapter
      */
@@ -30,7 +30,7 @@ class CompactSignatureSerializer implements CompactSignatureSerializerInterface
     /**
      * @return \BitWasp\Buffertools\Template
      */
-    private function getTemplate()
+    private function getTemplate(): Template
     {
         return (new TemplateFactory())
             ->uint8()
@@ -43,12 +43,12 @@ class CompactSignatureSerializer implements CompactSignatureSerializerInterface
      * @param CompactSignature $signature
      * @return BufferInterface
      */
-    private function doSerialize(CompactSignature $signature)
+    private function doSerialize(CompactSignature $signature): BufferInterface
     {
         return $this->getTemplate()->write([
             $signature->getFlags(),
-            $signature->getR(),
-            $signature->getS()
+            gmp_strval($signature->getR(), 10),
+            gmp_strval($signature->getS(), 10)
         ]);
     }
 
@@ -56,7 +56,7 @@ class CompactSignatureSerializer implements CompactSignatureSerializerInterface
      * @param CompactSignatureInterface $signature
      * @return BufferInterface
      */
-    public function serialize(CompactSignatureInterface $signature)
+    public function serialize(CompactSignatureInterface $signature): BufferInterface
     {
         /** @var CompactSignature $signature */
         return $this->doSerialize($signature);
@@ -67,34 +67,34 @@ class CompactSignatureSerializer implements CompactSignatureSerializerInterface
      * @return CompactSignature
      * @throws ParserOutOfRange
      */
-    public function fromParser(Parser $parser)
+    public function fromParser(Parser $parser): CompactSignature
     {
         $math = $this->ecAdapter->getMath();
 
         try {
             list ($byte, $r, $s) = $this->getTemplate()->parse($parser);
 
-            $recoveryFlags = $math->sub($byte, 27);
+            $recoveryFlags = $byte - 27;
             if ($recoveryFlags < 0 || $recoveryFlags > 7) {
                 throw new \InvalidArgumentException('invalid signature type');
             }
 
-            $isCompressed = $math->cmp($math->bitwiseAnd($recoveryFlags, 4), 0) !== 0;
+            $isCompressed = $math->cmp($math->bitwiseAnd(gmp_init($recoveryFlags), gmp_init(4)), gmp_init(0)) !== 0;
             $recoveryId = $recoveryFlags - ($isCompressed ? 4 : 0);
         } catch (ParserOutOfRange $e) {
             throw new ParserOutOfRange('Failed to extract full signature from parser');
         }
 
-        return new CompactSignature($this->ecAdapter, $r, $s, $recoveryId, $isCompressed);
+        return new CompactSignature($this->ecAdapter, gmp_init($r, 10), gmp_init($s, 10), $recoveryId, $isCompressed);
     }
 
     /**
-     * @param $string
-     * @return CompactSignature
+     * @param BufferInterface $string
+     * @return CompactSignatureInterface
      * @throws ParserOutOfRange
      */
-    public function parse($string)
+    public function parse(BufferInterface $string): CompactSignatureInterface
     {
-        return $this->fromParser(new Parser($string, $this->ecAdapter->getMath()));
+        return $this->fromParser(new Parser($string));
     }
 }

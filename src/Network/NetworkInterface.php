@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Network;
 
 interface NetworkInterface
@@ -9,50 +11,68 @@ interface NetworkInterface
      *
      * @return string
      */
-    public function getAddressByte();
+    public function getAddressByte(): string;
+
+    /**
+     * Return a address prefix length in bytes
+     *
+     * @return int
+     */
+    public function getAddressPrefixLength(): int;
+
+    /**
+     * Return the string that binds address signed messages to
+     * this network
+     *
+     * @return string
+     */
+    public function getSignedMessageMagic(): string;
+
+    /**
+     * Returns the prefix for bech32 segwit addresses
+     *
+     * @return string
+     */
+    public function getSegwitBech32Prefix(): string;
 
     /**
      * Return the p2sh byte for the network
      *
      * @return string
      */
-    public function getP2shByte();
+    public function getP2shByte(): string;
 
     /**
-     * @return string
+     * Return the p2sh prefix length in bytes for the network
+     *
+     * @return int
      */
-    public function getP2WPKHByte();
+    public function getP2shPrefixLength(): int;
 
     /**
      * Get the private key byte for the network
      *
      * @return string
      */
-    public function getPrivByte();
-
-    /**
-     * Check if the network is testnet
-     *
-     * @return bool
-     */
-    public function isTestnet();
+    public function getPrivByte(): string;
 
     /**
      * Return the HD public bytes for this network
      *
      * @return string
      */
-    public function getHDPubByte();
+    public function getHDPubByte(): string;
 
     /**
      * Return the HD private bytes for this network
      *
      * @return string
      */
-    public function getHDPrivByte();
+    public function getHDPrivByte(): string;
 
     /**
+     * Returns the magic bytes for P2P messages
      * @return string
      */
-    public function getNetMagicBytes();
+    public function getNetMagicBytes(): string;
 }

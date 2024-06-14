@@ -1,47 +1,70 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Transaction\SignatureHash;
 
 use BitWasp\Bitcoin\Crypto\Hash;
-use BitWasp\Bitcoin\Script\ScriptFactory;
+use BitWasp\Bitcoin\Script\ScriptInterface;
+use BitWasp\Bitcoin\Serializer\Transaction\OutPointSerializer;
+use BitWasp\Bitcoin\Serializer\Transaction\OutPointSerializerInterface;
+use BitWasp\Bitcoin\Serializer\Transaction\TransactionOutputSerializer;
 use BitWasp\Bitcoin\Transaction\TransactionInterface;
 use BitWasp\Buffertools\Buffer;
 use BitWasp\Buffertools\BufferInterface;
-use BitWasp\Bitcoin\Script\ScriptInterface;
+use BitWasp\Buffertools\Buffertools;
 
-class V1Hasher
+class V1Hasher extends SigHash
 {
     /**
      * @var TransactionInterface
      */
-    private $transaction;
+    protected $transaction;
 
     /**
-     * @var int|string
+     * @var int
      */
-    private $amount;
+    protected $amount;
+
+    /**
+     * @var TransactionOutputSerializer
+     */
+    protected $outputSerializer;
+
+    /**
+     * @var OutPointSerializerInterface
+     */
+    protected $outpointSerializer;
 
     /**
      * V1Hasher constructor.
      * @param TransactionInterface $transaction
-     * @param int|string $amount
+     * @param int $amount
+     * @param OutPointSerializerInterface $outpointSerializer
+     * @param TransactionOutputSerializer|null $outputSerializer
      */
-    public function __construct(TransactionInterface $transaction, $amount)
-    {
-        $this->transaction = $transaction;
+    public function __construct(
+        TransactionInterface $transaction,
+        int $amount,
+        OutPointSerializerInterface $outpointSerializer = null,
+        TransactionOutputSerializer $outputSerializer = null
+    ) {
         $this->amount = $amount;
+        $this->outputSerializer = $outputSerializer ?: new TransactionOutputSerializer();
+        $this->outpointSerializer = $outpointSerializer ?: new OutPointSerializer();
+        parent::__construct($transaction);
     }
 
     /**
      * @param int $sighashType
-     * @return Buffer|BufferInterface
+     * @return BufferInterface
      */
-    public function hashPrevOuts($sighashType)
+    public function hashPrevOuts(int $sighashType): BufferInterface
     {
-        if (!($sighashType & SigHashInterface::ANYONECANPAY)) {
+        if (!($sighashType & SigHash::ANYONECANPAY)) {
             $binary = '';
-            foreach ($this->transaction->getInputs() as $input) {
-                $binary .= $input->getOutPoint()->getBinary();
+            foreach ($this->tx->getInputs() as $input) {
+                $binary .= $this->outpointSerializer->serialize($input->getOutPoint())->getBinary();
             }
             return Hash::sha256d(new Buffer($binary));
         }
@@ -51,15 +74,16 @@ class V1Hasher
 
     /**
      * @param int $sighashType
-     * @return Buffer|BufferInterface
+     * @return BufferInterface
      */
-    public function hashSequences($sighashType)
+    public function hashSequences(int $sighashType): BufferInterface
     {
-        if (!($sighashType & SigHashInterface::ANYONECANPAY) && ($sighashType & 0x1f) != SigHashInterface::SINGLE && ($sighashType & 0x1f) != SigHashInterface::NONE) {
+        if (!($sighashType & SigHash::ANYONECANPAY) && ($sighashType & 0x1f) !== SigHash::SINGLE && ($sighashType & 0x1f) !== SigHash::NONE) {
             $binary = '';
-            foreach ($this->transaction->getInputs() as $input) {
-                $binary .= Buffer::int($input->getSequence())->flip()->getBinary();
+            foreach ($this->tx->getInputs() as $input) {
+                $binary .= pack('V', $input->getSequence());
             }
+
             return Hash::sha256d(new Buffer($binary));
         }
 
@@ -69,18 +93,18 @@ class V1Hasher
     /**
      * @param int $sighashType
      * @param int $inputToSign
-     * @return Buffer|BufferInterface
+     * @return BufferInterface
      */
-    public function hashOutputs($sighashType, $inputToSign)
+    public function hashOutputs(int $sighashType, int $inputToSign): BufferInterface
     {
-        if (($sighashType & 0x1f) !== SigHashInterface::SINGLE && ($sighashType & 0x1f) != SigHashInterface::NONE) {
+        if (($sighashType & 0x1f) !== SigHash::SINGLE && ($sighashType & 0x1f) !== SigHash::NONE) {
             $binary = '';
-            foreach ($this->transaction->getOutputs() as $output) {
-                $binary .= $output->getBinary();
+            foreach ($this->tx->getOutputs() as $output) {
+                $binary .= $this->outputSerializer->serialize($output)->getBinary();
             }
             return Hash::sha256d(new Buffer($binary));
-        } elseif (($sighashType & 0x1f) == SigHashInterface::SINGLE && $inputToSign < count($this->transaction->getOutputs())) {
-            return Hash::sha256($this->transaction->getOutput($inputToSign)->getBuffer());
+        } elseif (($sighashType & 0x1f) === SigHash::SINGLE && $inputToSign < count($this->tx->getOutputs())) {
+            return Hash::sha256d($this->outputSerializer->serialize($this->tx->getOutput($inputToSign)));
         }
 
         return new Buffer('', 32);
@@ -89,8 +113,7 @@ class V1Hasher
     /**
      * Calculate the hash of the current transaction, when you are looking to
      * spend $txOut, and are signing $inputToSign. The SigHashType defaults to
-     * SIGHASH_ALL, though SIGHASH_SINGLE, SIGHASH_NONE, SIGHASH_ANYONECANPAY
-     * can be used.
+     * SIGHASH_ALL
      *
      * @param ScriptInterface $txOutScript
      * @param int $inputToSign
@@ -98,27 +121,31 @@ class V1Hasher
      * @return BufferInterface
      * @throws \Exception
      */
-    public function calculate(ScriptInterface $txOutScript, $inputToSign, $sighashType = SigHashInterface::ALL)
-    {
-        $sighashType = (int) $sighashType;
+    public function calculate(
+        ScriptInterface $txOutScript,
+        int $inputToSign,
+        int $sighashType = SigHash::ALL
+    ): BufferInterface {
 
         $hashPrevOuts = $this->hashPrevOuts($sighashType);
         $hashSequence = $this->hashSequences($sighashType);
         $hashOutputs = $this->hashOutputs($sighashType, $inputToSign);
+        $input = $this->tx->getInput($inputToSign);
 
-        $input = $this->transaction->getInput($inputToSign);
-
-        return Hash::sha256d(new Buffer(
-            pack("V", $this->transaction->getVersion()) .
+        $scriptBuf = $txOutScript->getBuffer();
+        $preimage = new Buffer(
+            pack("V", $this->tx->getVersion()) .
             $hashPrevOuts->getBinary() .
             $hashSequence->getBinary() .
-            $input->getOutPoint()->getBinary() .
-            ScriptFactory::create()->push($txOutScript->getBuffer())->getScript()->getBinary() .
-            Buffer::int($this->amount, 8)->flip()->getBinary() .
+            $this->outpointSerializer->serialize($input->getOutPoint())->getBinary() .
+            Buffertools::numToVarInt($scriptBuf->getSize())->getBinary() . $scriptBuf->getBinary() .
+            pack("P", $this->amount) .
             pack("V", $input->getSequence()) .
             $hashOutputs->getBinary() .
-            pack("V", $this->transaction->getLockTime()) .
+            pack("V", $this->tx->getLockTime()) .
             pack("V", $sighashType)
-        ));
+        );
+
+        return Hash::sha256d($preimage);
     }
 }

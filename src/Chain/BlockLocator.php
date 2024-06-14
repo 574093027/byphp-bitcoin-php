@@ -1,10 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Chain;
 
-use BitWasp\Bitcoin\Serializer\Chain\BlockLocatorSerializer;
 use BitWasp\Bitcoin\Serializable;
-use BitWasp\Buffertools\Buffer;
+use BitWasp\Bitcoin\Serializer\Chain\BlockLocatorSerializer;
 use BitWasp\Buffertools\BufferInterface;
 
 class BlockLocator extends Serializable
@@ -43,7 +44,7 @@ class BlockLocator extends Serializable
     /**
      * @return BufferInterface[]
      */
-    public function getHashes()
+    public function getHashes(): array
     {
         return $this->hashes;
     }
@@ -51,7 +52,7 @@ class BlockLocator extends Serializable
     /**
      * @return BufferInterface
      */
-    public function getHashStop()
+    public function getHashStop(): BufferInterface
     {
         return $this->hashStop;
     }
@@ -59,7 +60,7 @@ class BlockLocator extends Serializable
     /**
      * @return BufferInterface
      */
-    public function getBuffer()
+    public function getBuffer(): BufferInterface
     {
         return (new BlockLocatorSerializer())->serialize($this);
     }

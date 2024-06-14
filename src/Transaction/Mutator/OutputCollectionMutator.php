@@ -1,12 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Transaction\Mutator;
 
-use BitWasp\Bitcoin\Collection\MutableCollection;
-use BitWasp\Bitcoin\Collection\Transaction\TransactionOutputCollection;
 use BitWasp\Bitcoin\Transaction\TransactionOutputInterface;
 
-class OutputCollectionMutator extends MutableCollection
+class OutputCollectionMutator extends AbstractCollectionMutator
 {
     /**
      * @param TransactionOutputInterface[] $outputs
@@ -24,7 +24,7 @@ class OutputCollectionMutator extends MutableCollection
     /**
      * @return OutputMutator
      */
-    public function current()
+    public function current(): OutputMutator
     {
         return $this->set->current();
     }
@@ -33,7 +33,7 @@ class OutputCollectionMutator extends MutableCollection
      * @param int $offset
      * @return OutputMutator
      */
-    public function offsetGet($offset)
+    public function offsetGet($offset): OutputMutator
     {
         if (!$this->set->offsetExists($offset)) {
             throw new \OutOfRangeException('Nothing found at this offset');
@@ -43,24 +43,24 @@ class OutputCollectionMutator extends MutableCollection
     }
 
     /**
-     * @return TransactionOutputCollection
+     * @return TransactionOutputInterface[]
      */
-    public function done()
+    public function done(): array
     {
         $set = [];
         foreach ($this->set as $mutator) {
             $set[] = $mutator->done();
         }
 
-        return new TransactionOutputCollection($set);
+        return $set;
     }
 
     /**
-     * @param int|string $start
-     * @param int|string $length
+     * @param int $start
+     * @param int $length
      * @return $this
      */
-    public function slice($start, $length)
+    public function slice(int $start, int $length)
     {
         $end = count($this->set);
         if ($start > $end || $length > $end) {

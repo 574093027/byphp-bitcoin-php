@@ -1,20 +1,20 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Block;
 
+use BitWasp\Bitcoin\Bloom\BloomFilter;
 use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Serializable;
 use BitWasp\Bitcoin\Serializer\Block\BlockHeaderSerializer;
 use BitWasp\Bitcoin\Serializer\Block\BlockSerializer;
-use BitWasp\Bitcoin\Collection\Transaction\TransactionCollection;
-use BitWasp\Bitcoin\Bloom\BloomFilter;
 use BitWasp\Bitcoin\Serializer\Transaction\TransactionSerializer;
-use BitWasp\CommonTrait\FunctionAliasArrayAccess;
+use BitWasp\Bitcoin\Transaction\TransactionInterface;
+use BitWasp\Buffertools\BufferInterface;
 
 class Block extends Serializable implements BlockInterface
 {
-    use FunctionAliasArrayAccess;
-
     /**
      * @var Math
      */
@@ -26,7 +26,7 @@ class Block extends Serializable implements BlockInterface
     private $header;
 
     /**
-     * @var TransactionCollection
+     * @var TransactionInterface[]
      */
     private $transactions;
 
@@ -36,26 +36,23 @@ class Block extends Serializable implements BlockInterface
     private $merkleRoot;
 
     /**
+     * Block constructor.
      * @param Math $math
      * @param BlockHeaderInterface $header
-     * @param TransactionCollection $transactions
+     * @param TransactionInterface[] ...$transactions
      */
-    public function __construct(Math $math, BlockHeaderInterface $header, TransactionCollection $transactions)
+    public function __construct(Math $math, BlockHeaderInterface $header, TransactionInterface ...$transactions)
     {
         $this->math = $math;
         $this->header = $header;
         $this->transactions = $transactions;
-        $this
-            ->initFunctionAlias('header', 'getHeader')
-            ->initFunctionAlias('merkleRoot', 'getMerkleRoot')
-            ->initFunctionAlias('tx', 'getTransactions');
     }
 
     /**
      * {@inheritdoc}
      * @see \BitWasp\Bitcoin\Block\BlockInterface::getHeader()
      */
-    public function getHeader()
+    public function getHeader(): BlockHeaderInterface
     {
         return $this->header;
     }
@@ -65,7 +62,7 @@ class Block extends Serializable implements BlockInterface
      * @see \BitWasp\Bitcoin\Block\BlockInterface::getMerkleRoot()
      * @throws \BitWasp\Bitcoin\Exceptions\MerkleTreeEmpty
      */
-    public function getMerkleRoot()
+    public function getMerkleRoot(): BufferInterface
     {
         if (null === $this->merkleRoot) {
             $this->merkleRoot = new MerkleRoot($this->math, $this->getTransactions());
@@ -76,19 +73,24 @@ class Block extends Serializable implements BlockInterface
 
     /**
      * @see \BitWasp\Bitcoin\Block\BlockInterface::getTransactions()
-     * @return TransactionCollection
+     * @return TransactionInterface[]
      */
-    public function getTransactions()
+    public function getTransactions(): array
     {
         return $this->transactions;
     }
 
     /**
+     * @see \BitWasp\Bitcoin\Block\BlockInterface::getTransaction()
      * @param int $i
-     * @return \BitWasp\Bitcoin\Transaction\TransactionInterface
+     * @return TransactionInterface
      */
-    public function getTransaction($i)
+    public function getTransaction(int $i): TransactionInterface
     {
+        if (!array_key_exists($i, $this->transactions)) {
+            throw new \InvalidArgumentException("No transaction in the block with this index");
+        }
+
         return $this->transactions[$i];
     }
 
@@ -96,7 +98,7 @@ class Block extends Serializable implements BlockInterface
      * @param BloomFilter $filter
      * @return FilteredBlock
      */
-    public function filter(BloomFilter $filter)
+    public function filter(BloomFilter $filter): FilteredBlock
     {
         $vMatch = [];
         $vHashes = [];
@@ -115,7 +117,7 @@ class Block extends Serializable implements BlockInterface
      * {@inheritdoc}
      * @see \BitWasp\Buffertools\SerializableInterface::getBuffer()
      */
-    public function getBuffer()
+    public function getBuffer(): BufferInterface
     {
         return (new BlockSerializer($this->math, new BlockHeaderSerializer(), new TransactionSerializer()))->serialize($this);
     }

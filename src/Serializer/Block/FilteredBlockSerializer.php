@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Serializer\Block;
 
 use BitWasp\Bitcoin\Block\FilteredBlock;
@@ -34,31 +36,28 @@ class FilteredBlockSerializer
      * @param Parser $parser
      * @return FilteredBlock
      */
-    public function fromParser(Parser $parser)
+    public function fromParser(Parser $parser): FilteredBlock
     {
-        $header = $this->headerSerializer->fromParser($parser);
-        $partialTree = $this->treeSerializer->fromParser($parser);
-
         return new FilteredBlock(
-            $header,
-            $partialTree
+            $this->headerSerializer->fromParser($parser),
+            $this->treeSerializer->fromParser($parser)
         );
     }
 
     /**
-     * @param BufferInterface|string $data
+     * @param BufferInterface $data
      * @return FilteredBlock
      */
-    public function parse($data)
+    public function parse(BufferInterface $data): FilteredBlock
     {
         return $this->fromParser(new Parser($data));
     }
 
     /**
      * @param FilteredBlock $merkleBlock
-     * @return \BitWasp\Buffertools\BufferInterface
+     * @return BufferInterface
      */
-    public function serialize(FilteredBlock $merkleBlock)
+    public function serialize(FilteredBlock $merkleBlock): BufferInterface
     {
         return Buffertools::concat(
             $this->headerSerializer->serialize($merkleBlock->getHeader()),

@@ -1,20 +1,24 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Crypto\EcAdapter\Impl\Secp256k1\Signature;
 
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\Secp256k1\Adapter\EcAdapter;
 use BitWasp\Bitcoin\Crypto\EcAdapter\Impl\Secp256k1\Serializer\Signature\DerSignatureSerializer;
+use BitWasp\Bitcoin\Crypto\EcAdapter\Signature\SignatureInterface;
 use BitWasp\Bitcoin\Serializable;
+use BitWasp\Buffertools\BufferInterface;
 
 class Signature extends Serializable implements SignatureInterface
 {
     /**
-     * @var int|string
+     * @var \GMP
      */
     private $r;
 
     /**
-     * @var  int|string
+     * @var  \GMP
      */
     private $s;
 
@@ -30,11 +34,11 @@ class Signature extends Serializable implements SignatureInterface
 
     /**
      * @param EcAdapter $adapter
-     * @param int|string $r
-     * @param int|string $s
+     * @param \GMP $r
+     * @param \GMP $s
      * @param resource $secp256k1_ecdsa_signature_t
      */
-    public function __construct(EcAdapter $adapter, $r, $s, $secp256k1_ecdsa_signature_t)
+    public function __construct(EcAdapter $adapter, \GMP $r, \GMP $s, $secp256k1_ecdsa_signature_t)
     {
         if (!is_resource($secp256k1_ecdsa_signature_t) ||
             !get_resource_type($secp256k1_ecdsa_signature_t) === SECP256K1_TYPE_SIG
@@ -49,7 +53,7 @@ class Signature extends Serializable implements SignatureInterface
     }
 
     /**
-     * @return int|string
+     * @return \GMP
      */
     public function getR()
     {
@@ -57,7 +61,7 @@ class Signature extends Serializable implements SignatureInterface
     }
 
     /**
-     * @return int|string
+     * @return \GMP
      */
     public function getS()
     {
@@ -73,9 +77,33 @@ class Signature extends Serializable implements SignatureInterface
     }
 
     /**
-     * @return \BitWasp\Buffertools\BufferInterface
+     * @param Signature $other
+     * @return bool
      */
-    public function getBuffer()
+    private function doEquals(Signature $other): bool
+    {
+        $a = '';
+        $b = '';
+        secp256k1_ecdsa_signature_serialize_der($this->ecAdapter->getContext(), $a, $this->getResource());
+        secp256k1_ecdsa_signature_serialize_der($this->ecAdapter->getContext(), $b, $other->getResource());
+
+        return hash_equals($a, $b);
+    }
+
+    /**
+     * @param SignatureInterface $signature
+     * @return bool
+     */
+    public function equals(SignatureInterface $signature): bool
+    {
+        /** @var Signature $signature */
+        return $this->doEquals($signature);
+    }
+
+    /**
+     * @return BufferInterface
+     */
+    public function getBuffer(): BufferInterface
     {
         return (new DerSignatureSerializer($this->ecAdapter))->serialize($this);
     }

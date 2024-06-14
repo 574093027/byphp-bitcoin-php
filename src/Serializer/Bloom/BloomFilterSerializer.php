@@ -1,75 +1,88 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BitWasp\Bitcoin\Serializer\Bloom;
 
 use BitWasp\Bitcoin\Bitcoin;
-use BitWasp\Bitcoin\Math\Math;
 use BitWasp\Bitcoin\Bloom\BloomFilter;
-use BitWasp\Buffertools\Buffer;
+use BitWasp\Bitcoin\Serializer\Types;
 use BitWasp\Buffertools\BufferInterface;
 use BitWasp\Buffertools\Parser;
-use BitWasp\Buffertools\TemplateFactory;
 
 class BloomFilterSerializer
 {
     /**
-     * @return \BitWasp\Buffertools\Template
+     * @var \BitWasp\Buffertools\Types\Uint32
      */
-    public function getTemplate()
+    private $uint32le;
+
+    /**
+     * @var \BitWasp\Buffertools\Types\Uint8
+     */
+    private $uint8le;
+
+    /**
+     * @var \BitWasp\Buffertools\Types\VarInt
+     */
+    private $varint;
+
+    public function __construct()
     {
-        return (new TemplateFactory())
-            ->vector(function (Parser $parser) {
-                return $parser->readBytes(1)->getInt();
-            })
-            ->uint32le()
-            ->uint32le()
-            ->uint8()
-            ->getTemplate();
+        $this->uint32le = Types::uint32le();
+        $this->uint8le = Types::uint8le();
+        $this->varint = Types::varint();
     }
 
     /**
      * @param BloomFilter $filter
      * @return BufferInterface
      */
-    public function serialize(BloomFilter $filter)
+    public function serialize(BloomFilter $filter): BufferInterface
     {
-        $math = new Math();
-
-        $vBuf = [];
+        $parser = new Parser();
+        $parser->appendBinary($this->varint->write(count($filter->getData())));
         foreach ($filter->getData() as $i) {
-            $vBuf[] = Buffer::int($i, 1, $math);
+            $parser->appendBinary(pack('c', $i));
         }
 
-        return $this->getTemplate()->write([
-            $vBuf,
-            $filter->getNumHashFuncs(),
-            $filter->getTweak(),
-            (string) $filter->getFlags()
-        ]);
+        $parser->appendBinary($this->uint32le->write($filter->getNumHashFuncs()));
+        $parser->appendBinary($this->uint32le->write($filter->getTweak()));
+        $parser->appendBinary($this->uint8le->write($filter->getFlags()));
+
+        return $parser->getBuffer();
     }
 
     /**
      * @param Parser $parser
      * @return BloomFilter
      */
-    public function fromParser(Parser $parser)
+    public function fromParser(Parser $parser): BloomFilter
     {
-        list ($vData, $numHashFuncs, $nTweak, $flags) = $this->getTemplate()->parse($parser);
+        $varint = (int) $this->varint->read($parser);
+        $vData = [];
+        for ($i = 0; $i < $varint; $i++) {
+            $vData[] = (int) $this->uint8le->read($parser);
+        }
+
+        $nHashFuncs = (int) $this->uint32le->read($parser);
+        $nTweak = (int) $this->uint32le->read($parser);
+        $flags = (int) $this->uint8le->read($parser);
 
         return new BloomFilter(
             Bitcoin::getMath(),
             $vData,
-            $numHashFuncs,
+            $nHashFuncs,
             $nTweak,
             $flags
         );
     }
 
     /**
-     * @param $data
+     * @param BufferInterface $data
      * @return BloomFilter
      */
-    public function parse($data)
+    public function parse(BufferInterface $data): BloomFilter
     {
         return $this->fromParser(new Parser($data));
     }
